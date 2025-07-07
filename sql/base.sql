@@ -49,7 +49,8 @@ CREATE TABLE fond (
 CREATE TABLE type_pret (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(100) NOT NULL,
-    taux_interet DECIMAL(5,2) NOT NULL CHECK (taux_interet >= 0)
+    taux_interet DECIMAL(5,2) NOT NULL CHECK (taux_interet >= 0),
+    duree_mois INT NOT NULL
 );
 
 -- Table: pret
@@ -59,7 +60,6 @@ CREATE TABLE pret (
     id_agent INT,
     id_type_pret INT,
     montant DECIMAL(12,2) NOT NULL,
-    duree_mois INT NOT NULL,
     date_demande DATE DEFAULT CURRENT_DATE,
     statut VARCHAR(20) DEFAULT 'en attente',
     FOREIGN KEY (id_client) REFERENCES client(id),

@@ -4,9 +4,13 @@ require_once __DIR__ . '/../db.php';
 
 class Client {
     public static function all(): array {
-        return getDB()->query("SELECT * FROM banque_client")
-                      ->fetchAll(PDO::FETCH_ASSOC);
-    }
+    return getDB()->query("
+        SELECT c.id, c.id_utilisateur, u.nom AS nom_utilisateur
+        FROM banque_client c
+        JOIN banque_utilisateur u ON c.id_utilisateur = u.id
+    ")->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
     public static function find(int $id): ?array {
     $st = getDB()->prepare("

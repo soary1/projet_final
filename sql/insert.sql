@@ -28,18 +28,18 @@ START TRANSACTION;
    Utilisateurs
    ------------------------------ */
 INSERT INTO banque_utilisateur (id, nom, email, mot_de_passe) VALUES
-  (1, 'Jean Dupont',      'jean.dupont@example.com',      'password123'),
-  (2, 'Claire Bernard',   'claire.bernard@example.com',   'password123'),
-  (3, 'Alexandre Girard', 'alex.girard@example.com',      'password123'),
-  (4, 'Sophie Agent',     'sophie.agent@example.com',     'password123');
+  (4, 'Jean Dupont',      'jean.dupont@example.com',      'password123'),
+  (5, 'Claire Bernard',   'claire.bernard@example.com',   'password123'),
+  (6, 'Alexandre Girard', 'alex.girard@example.com',      'password123'),
+  (7, 'Sophie Agent',     'sophie.agent@example.com',     'password123');
 
 
 /* ------------------------------
    Clients
    ------------------------------ */
 INSERT INTO banque_client (id, id_utilisateur, profession, revenu_mensuel) VALUES
-  (1, 1, 'Ingénieur logiciel', 4200.00),
-  (2, 2, 'Designer graphique', 3500.00);
+  (2, 4, 'Ingénieur logiciel', 4200.00),
+  (3, 5, 'Designer graphique', 3500.00);
 
 /* ------------------------------
    Agents

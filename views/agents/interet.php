@@ -90,12 +90,17 @@
     <tbody id="table-interets"></tbody>
     <tfoot>
       <tr class="total-row">
-        <td colspan="5">Total Intérêts Mensuels</td>
-        <td colspan="2" id="total-mensuel">0 Ar</td>
+        <td colspan="5">Total Intérêts Mensuels (Simples)</td>
+        <td colspan="2" id="total-simple">0 Ar</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="5">Total Intérêts Mensuels (Composés)</td>
+        <td colspan="2" id="total-compose">0 Ar</td>
       </tr>
     </tfoot>
   </table>
 
+  <h3 style="margin-top: 50px;">📊 Illustration du graphique des intérêts mensuels (Simple vs Composé)</h3>
   <canvas id="interetChart" width="800" height="300"></canvas>
 
   <script>
@@ -112,48 +117,91 @@
         .then(data => {
           const tbody = document.getElementById("table-interets");
           tbody.innerHTML = "";
-          let total = 0;
-          const interetsParMois = {};
+          let totalSimple = 0;
+          let totalCompose = 0;
+
+          const simples = {};
+          const composes = {};
 
           data.forEach(p => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
               <td>${p.nom_client}</td>
-              <td>${p.montant} Ar</td>
+              <td>${parseFloat(p.montant).toLocaleString()} Ar</td>
               <td>${p.taux_interet}%</td>
               <td>${p.duree_mois}</td>
               <td>${p.mois}</td>
-              <td>${p.interet_total} Ar</td>
-              <td>${p.interet_mensuel} Ar</td>
+              <td>
+                <strong>Simple:</strong> ${parseFloat(p.interet_simple_total).toLocaleString()} Ar<br>
+                <strong>Composé:</strong> ${parseFloat(p.interet_compose_total).toLocaleString()} Ar
+              </td>
+              <td>
+                <strong>Simple:</strong> ${parseFloat(p.interet_simple_mensuel).toLocaleString()} Ar<br>
+                <strong>Composé:</strong> ${parseFloat(p.interet_compose_mensuel).toLocaleString()} Ar
+              </td>
             `;
             tbody.appendChild(tr);
 
-            total += parseFloat(p.interet_mensuel);
+            totalSimple += parseFloat(p.interet_simple_mensuel);
+            totalCompose += parseFloat(p.interet_compose_mensuel);
+
             const mois = p.mois;
-            if (!interetsParMois[mois]) interetsParMois[mois] = 0;
-            interetsParMois[mois] += parseFloat(p.interet_mensuel);
+            simples[mois] = (simples[mois] || 0) + parseFloat(p.interet_simple_mensuel);
+            composes[mois] = (composes[mois] || 0) + parseFloat(p.interet_compose_mensuel);
           });
 
-          document.getElementById("total-mensuel").textContent = total.toFixed(2) + " Ar";
+          document.getElementById("total-simple").textContent = totalSimple.toLocaleString(undefined, {minimumFractionDigits: 2}) + " Ar";
+          document.getElementById("total-compose").textContent = totalCompose.toLocaleString(undefined, {minimumFractionDigits: 2}) + " Ar";
+
+          const labels = [...new Set([...Object.keys(simples), ...Object.keys(composes)])].sort();
 
           const ctx = document.getElementById("interetChart").getContext("2d");
           if (window.myChart) window.myChart.destroy();
 
           window.myChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-              labels: Object.keys(interetsParMois),
-              datasets: [{
-                label: 'Intérêts mensuels (Ar)',
-                data: Object.values(interetsParMois),
-                backgroundColor: '#4CAF50',
-              }]
+              labels: labels,
+              datasets: [
+                {
+                  label: "Intérêt simple",
+                  data: labels.map(mois => simples[mois] || 0),
+                  borderColor: "orange",
+                  backgroundColor: "orange",
+                  fill: false,
+                  tension: 0.3
+                },
+                {
+                  label: "Intérêt composé",
+                  data: labels.map(mois => composes[mois] || 0),
+                  borderColor: "orangered",
+                  backgroundColor: "orangered",
+                  fill: false,
+                  tension: 0.3
+                }
+              ]
             },
             options: {
               responsive: true,
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Comparaison des intérêts mensuels (simple vs composé)"
+                }
+              },
               scales: {
                 y: {
-                  beginAtZero: true
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: "Montant des intérêts (Ar)"
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: "Mois"
+                  }
                 }
               }
             }
@@ -171,9 +219,8 @@
       chargerInterets(mois_debut, annee_debut, mois_fin, annee_fin);
     });
 
-    // Affichage initial : tout
+    // Chargement initial
     window.onload = () => chargerInterets();
   </script>
-
 </body>
 </html>

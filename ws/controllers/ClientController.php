@@ -32,12 +32,27 @@ class ClientController
         Flight::json(TypePret::all());
     }
 
-    public static function createTypePret(): void
-    {
-        $d  = Flight::request()->data;
-        $id = TypePret::create($d['libelle'], $d['taux']);
-        Flight::json(['id' => $id], 201);
+       public static function createTypePret(): void
+{
+    $d = Flight::request()->data;
+
+    // Vérification des champs nécessaires
+    if (!isset($d['nom'], $d['taux_interet'], $d['duree_mois'], $d['delai_defaut'])) {
+        Flight::json(['success' => false, 'message' => 'Champs manquants'], 400);
+        return;
     }
+
+    // Création du type de prêt
+    $id = TypePret::create(
+        $d['nom'],
+        (float) $d['taux_interet'],
+        (int) $d['duree_mois'],
+        (int) $d['delai_defaut']
+    );
+
+    Flight::json(['success' => true, 'id' => $id], 201);
+}
+
 
     public static function getClientById($id): void {
         $client = Client::find((int)$id);

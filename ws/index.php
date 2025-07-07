@@ -1,27 +1,10 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
+require 'routes/etudiant_routes.php';
+require 'routes/client_routes.php';
+require 'routes/pres_routes.php';
+require 'routes/type_pret_route.php';
 
-/* ----------- Charger le contrôleur ----------- */
-require_once __DIR__ . '\..\controllers\ClientController.php';
-require_once __DIR__ . '\..\controllers\TypePretController.php';
-require_once __DIR__ . '\..\controllers\Pret.php';
-
-
-
-
-/* -------------- CLIENTS -------------------- */
-Flight::route('GET /clients',             ['ClientController', 'getAllClients']);
-Flight::route('POST /clients',            ['ClientController', 'createClient']);
-Flight::route('DELETE /clients/@id',      ['ClientController', 'deleteClient']);
-
-/* ------------- TYPES DE PRÊT --------------- */
-Flight::route('GET /types-pret',          ['TypePretController', 'getAllTypesPret']);
-Flight::route('POST /types-pret',         ['TypePretController', 'createTypePret']);
-
-/* ----------------- PRÊTS ------------------- */
-Flight::route('GET /clients/@id/prets',   ['Pret', 'listPretByClient']);
-Flight::route('POST /clients/@id/prets',  ['Pret', 'createPret']);
-Flight::route('DELETE /prets/@id',        ['Pret', 'deletePret']);
 
 Flight::start();

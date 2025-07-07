@@ -1,7 +1,7 @@
 <?php
 
 
-require_once __DIR__ . '/../models/TypePretController.php';
+require_once __DIR__ . '/../models/TypePret.php';
 
 class TypePretController 
 {

@@ -3,18 +3,25 @@
 
 require_once __DIR__ . '/../models/Pret.php';
 
-class Pret 
+class PretController
 {
-  public static function listPretByClient(int $idClient): void
+
+    
+  public static function getAllPrets(): void
     {
-        Flight::json(Pret::byClient($idClient));
+        Flight::json(Pret::all());
+    }
+  
+    public static function listPretByClient($id): void
+    {
+        Flight::json(Pret::byClient($id));
     }
 
     public static function createPret(int $idClient): void
     {
         $d  = Flight::request()->data;
         $id = Pret::create($idClient, $d['id_type_pret'], $d['montant']);
-        Flight::json(['id' => $id], 201);
+        Flight::json(['id' => $id], 200);
     }
 
     public static function deletePret(int $id): void

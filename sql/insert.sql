@@ -7,10 +7,11 @@ START TRANSACTION;
    Utilisateurs
    ------------------------------ */
 INSERT INTO banque_utilisateur (id, nom, email, mot_de_passe) VALUES
-  (1, 'Jean Dupont',       'jean.dupont@example.com',       SHA2('password123',256)),
-  (2, 'Claire Bernard',    'claire.bernard@example.com',    SHA2('password123',256)),
-  (3, 'Alexandre Girard',  'alex.girard@example.com',       SHA2('password123',256)),
-  (4, 'Sophie Agent',      'sophie.agent@example.com',      SHA2('password123',256));
+  (1, 'Jean Dupont',      'jean.dupont@example.com',      'password123'),
+  (2, 'Claire Bernard',   'claire.bernard@example.com',   'password123'),
+  (3, 'Alexandre Girard', 'alex.girard@example.com',      'password123'),
+  (4, 'Sophie Agent',     'sophie.agent@example.com',     'password123');
+
 
 /* ------------------------------
    Clients

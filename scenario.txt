@@ -1,0 +1,4 @@
+●	gestion de prêt pour les clients
+
+un client peut effectuer un pret
+voir 

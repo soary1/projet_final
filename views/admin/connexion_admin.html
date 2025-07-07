@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion Client - Banque</title>
+  <title>Connexion Admin - Banque</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
       margin: 0;
       padding: 0;
       min-height: 100vh;
@@ -23,7 +23,7 @@
       max-width: 400px;
       width: 100%;
       margin: 20px;
-      border-top: 5px solid #3498db;
+      border-top: 5px solid #e74c3c;
     }
 
     .login-header {
@@ -47,8 +47,8 @@
       margin-bottom: 20px;
     }
 
-    .client-badge {
-      background: linear-gradient(135deg, #3498db, #2980b9);
+    .admin-badge {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: white;
       padding: 8px 16px;
       border-radius: 20px;
@@ -83,13 +83,13 @@
     input[type="email"]:focus,
     input[type="password"]:focus {
       outline: none;
-      border-color: #3498db;
+      border-color: #e74c3c;
     }
 
     .login-button {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #3498db, #2980b9);
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
       color: white;
       border: none;
       border-radius: 8px;
@@ -101,7 +101,7 @@
 
     .login-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+      box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
     }
 
     .login-button:active {
@@ -128,32 +128,32 @@
       border: 1px solid #f5c6cb;
     }
 
-    .client-info {
-      background-color: #e8f4f8;
-      border: 1px solid #b8dce8;
+    .security-info {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
       border-radius: 8px;
       padding: 15px;
       margin-top: 20px;
     }
 
-    .client-info h4 {
+    .security-info h4 {
       margin: 0 0 10px 0;
-      color: #2471a3;
+      color: #856404;
       font-size: 14px;
       display: flex;
       align-items: center;
     }
 
-    .client-info ul {
+    .security-info ul {
       margin: 0;
       padding-left: 20px;
       font-size: 12px;
-      color: #2471a3;
+      color: #856404;
     }
 
     .demo-account {
-      background-color: #d1ecf1;
-      border: 1px solid #bee5eb;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
       border-radius: 8px;
       padding: 15px;
       margin-top: 20px;
@@ -161,14 +161,14 @@
 
     .demo-account h4 {
       margin: 0 0 10px 0;
-      color: #0c5460;
+      color: #721c24;
       font-size: 14px;
     }
 
     .demo-account p {
       margin: 5px 0;
       font-size: 12px;
-      color: #0c5460;
+      color: #721c24;
       font-family: monospace;
       background-color: rgba(255, 255, 255, 0.5);
       padding: 5px;
@@ -192,21 +192,21 @@
       background-color: rgba(255, 255, 255, 0.3);
     }
 
-    .client-features {
+    .admin-features {
       background-color: #f8f9fa;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
-      border-left: 4px solid #3498db;
+      border-left: 4px solid #e74c3c;
     }
 
-    .client-features h4 {
+    .admin-features h4 {
       margin: 0 0 10px 0;
       color: #2c3e50;
       font-size: 14px;
     }
 
-    .client-features ul {
+    .admin-features ul {
       margin: 0;
       padding-left: 20px;
       font-size: 13px;
@@ -216,22 +216,20 @@
 </head>
 <body>
 
-  <a href="index.html" class="back-home">← Retour à l'accueil</a>
-
   <div class="login-container">
     <div class="login-header">
       <div class="bank-logo">🏦</div>
-      <h1>Connexion Client</h1>
-      <div class="client-badge">👤 ESPACE CLIENT</div>
-      <p>Accédez à vos comptes et services</p>
+      <h1>Connexion Administrateur</h1>
+      <div class="admin-badge">🔐 ACCÈS SÉCURISÉ</div>
+      <p>Interface d'administration bancaire</p>
     </div>
 
     <div class="message" id="message"></div>
 
     <form id="loginForm" onsubmit="return false;">
       <div class="form-group">
-        <label for="email">Adresse email :</label>
-        <input type="email" id="email" name="email" required placeholder="votre@email.com">
+        <label for="email">Adresse email administrateur :</label>
+        <input type="email" id="email" name="email" required placeholder="admin@banque.com">
       </div>
 
       <div class="form-group">
@@ -239,36 +237,36 @@
         <input type="password" id="password" name="password" required placeholder="••••••••">
       </div>
 
-      <button type="button" class="login-button" onclick="seConnecterClient()">
-        🔓 Accéder à mon espace
+      <button type="button" class="login-button" onclick="seConnecterAdmin()">
+        🔓 Accéder à l'administration
       </button>
     </form>
 
-    <div class="client-features">
-      <h4>💼 Services clients :</h4>
+    <div class="admin-features">
+      <h4>⚙️ Fonctionnalités administrateur :</h4>
       <ul>
-        <li>Consultation de vos comptes</li>
-        <li>Historique des transactions</li>
-        <li>Demandes de prêts</li>
-        <li>Gestion du profil</li>
-        <li>Suivi des dossiers</li>
+        <li>Gestion des types de prêts</li>
+        <li>Configuration du système</li>
+        <li>Supervision des opérations</li>
+        <li>Gestion des utilisateurs</li>
+        <li>Rapports et statistiques</li>
       </ul>
     </div>
 
-    <div class="client-info">
-      <h4>🔒 Sécurité de vos données :</h4>
+    <div class="security-info">
+      <h4>🛡️ Sécurité renforcée :</h4>
       <ul>
-        <li>Connexion sécurisée SSL</li>
-        <li>Données bancaires protégées</li>
-        <li>Authentification forte</li>
-        <li>Session sécurisée</li>
+        <li>Authentification à deux facteurs</li>
+        <li>Journalisation des actions</li>
+        <li>Accès restreint et surveillé</li>
+        <li>Session sécurisée avec timeout</li>
       </ul>
     </div>
 
     <div class="demo-account">
-      <h4>💾 Compte de test :</h4>
-      <p>Utilisez votre compte client enregistré</p>
-      <p><em>Identifiants stockés de manière sécurisée</em></p>
+      <h4>� Utilisateur en base de données :</h4>
+      <p>Utilisez un compte administrateur créé dans la base</p>
+      <p><em>Les identifiants sont stockés de manière sécurisée</em></p>
     </div>
   </div>
 
@@ -286,7 +284,7 @@
       }, 5000);
     }
 
-    function seConnecterClient() {
+    function seConnecterAdmin() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
@@ -300,8 +298,7 @@
         afficherMessage('Veuillez entrer une adresse email valide', 'error');
         return;
       }
-
-      // Appel direct à l'API pour vérifier dans la base de données
+      
       const donnees = {
         email: email,
         mot_de_passe: password
@@ -316,26 +313,26 @@
       })
       .then(response => response.json())
       .then(data => {
-        if (data.succes && data.role === 'client') {
-          afficherMessage(`Bienvenue ${data.nom} !`, 'success');
+        if (data.succes && data.role === 'admin') {
+          afficherMessage(`Bienvenue Administrateur ${data.nom} !`, 'success');
           
           // Stocker les informations de session
           sessionStorage.setItem('utilisateur', JSON.stringify({
             id: data.id,
             email: email,
             nom: data.nom,
-            role: 'client',
-            profession: data.profession || '',
+            role: 'admin',
+            niveau_acces: data.niveau_acces || 'standard',
             connecte: true,
             derniere_connexion: new Date().toISOString()
           }));
 
-          // Redirection vers l'interface client
+          // Redirection vers l'interface admin
           setTimeout(() => {
-            window.location.href = 'client.html';
+            window.location.href = 'admin.html';
           }, 1500);
-        } else if (data.succes && data.role !== 'client') {
-          afficherMessage('Accès refusé. Ce compte n\'est pas un compte client.', 'error');
+        } else if (data.succes && data.role !== 'admin') {
+          afficherMessage('Accès refusé. Vous n\'avez pas les droits administrateur.', 'error');
         } else {
           afficherMessage('Email ou mot de passe incorrect', 'error');
         }
@@ -349,35 +346,35 @@
     // Permettre la soumission avec Enter
     document.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
-        seConnecterClient();
+        seConnecterAdmin();
       }
     });
 
-    // Vérifier si déjà connecté en tant que client
+    // Vérifier si déjà connecté en tant qu'admin
     document.addEventListener('DOMContentLoaded', function() {
       const utilisateur = sessionStorage.getItem('utilisateur');
       if (utilisateur) {
         const userData = JSON.parse(utilisateur);
-        if (userData.connecte && userData.role === 'client') {
-          afficherMessage(`Vous êtes déjà connecté`, 'success');
+        if (userData.connecte && userData.role === 'admin') {
+          afficherMessage(`Vous êtes déjà connecté en tant qu'administrateur`, 'success');
           setTimeout(() => {
-            window.location.href = 'client.html';
+            window.location.href = 'admin.html';
           }, 2000);
         }
       }
     });
 
-    // Session timeout plus courte pour les clients (15 minutes)
+    // Fonction de déconnexion automatique après inactivité (30 minutes pour admin)
     let inactivityTimer;
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
         sessionStorage.removeItem('utilisateur');
-        afficherMessage('Session expirée', 'error');
+        afficherMessage('Session expirée pour des raisons de sécurité', 'error');
         setTimeout(() => {
           window.location.href = 'index.html';
         }, 2000);
-      }, 15 * 60 * 1000); // 15 minutes
+      }, 30 * 60 * 1000); // 30 minutes
     }
 
     // Réinitialiser le timer sur activité

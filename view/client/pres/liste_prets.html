@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mes Prêts</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Mes Prêts</h1>
+
+  <a href="ajouter_pret.html">➕ Ajouter un prêt</a>
+
+  <table id="table-prets">
+    <thead>
+      <tr>
+        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const apiBase = "http://localhost/projet_final/ws";
+
+    function ajax(method, url, data, callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, apiBase + url, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          callback(JSON.parse(xhr.responseText));
+        }
+      };
+      xhr.send(data);
+    }
+
+    function chargerPrets() {
+      ajax("GET", "/prets", null, (data) => {
+        const tbody = document.querySelector("#table-prets tbody");
+        tbody.innerHTML = "";
+        data.forEach(p => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.id_client}</td>
+            <td>${p.type_pret}</td>
+            <td>${p.montant}</td>
+            <td>${p.statut}</td>
+            <td>${p.date_demande}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    chargerPrets();
+  </script>
+</body>
+</html>

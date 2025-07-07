@@ -72,4 +72,5 @@ Flight::route('POST /fond', function () {
     Flight::json(['message' => 'Fond ajouté']);
 });
 
+// Flight::set('flight.base_url', '/projet_final'); 
 Flight::start();

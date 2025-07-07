@@ -2,6 +2,26 @@
 require_once __DIR__ . '/../db.php';
 
 class Pret {
+
+ public static function all(): array {
+    return getDB()->query("
+        SELECT p.*, t.nom AS nom_type_pret, t.taux_interet
+        FROM banque_pret p
+        JOIN banque_type_pret t ON t.id = p.id_type_pret
+    ")->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public static function byClient(int $idClient): array {
+    $st = getDB()->prepare("
+        SELECT p.*, t.nom AS nom_type_pret, t.taux_interet
+        FROM banque_pret p
+        JOIN banque_type_pret t ON t.id = p.id_type_pret
+        WHERE p.id_client = ?
+    ");
+    $st->execute([$idClient]);
+    return $st->fetchAll(PDO::FETCH_ASSOC);
+}
+
     public static function getPretsEnAttente() {
         $db = getDB();
         $stmt = $db->query("
@@ -63,6 +83,7 @@ class Pret {
         return $st->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     public static function create(int $idClient, int $idTypePret, float $montant): int {
         $st = getDB()->prepare("
             INSERT INTO banque_pret (montant, date_demande, id_client, id_type_pret)
@@ -75,5 +96,43 @@ class Pret {
     public static function delete(int $id): void {
         $st = getDB()->prepare("DELETE FROM banque_pret WHERE id = ?");
         $st->execute([$id]);
+    }
+
+
+    public static function trouverOuCreerTypePret($nom, $taux, $duree) {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT id FROM banque_type_pret WHERE taux_interet = ? AND duree_mois = ?");
+        $stmt->execute([$taux, $duree]);
+        $result = $stmt->fetch();
+
+        if ($result) {
+            return $result['id'];
+        } else {
+            $stmt = $db->prepare("INSERT INTO banque_type_pret (nom, taux_interet, duree_mois) VALUES (?, ?, ?)");
+            $stmt->execute([$nom, $taux, $duree]);
+            return $db->lastInsertId();
+        }
+    }
+
+    public static function enregistrerPretSimule($idClient, $idAgent, $montant, $taux, $duree) {
+        $db = getDB();
+        $nomType = "Simulation $taux% sur $duree mois";
+        $idTypePret = self::trouverOuCreerTypePret($nomType, $taux, $duree);
+
+        $stmt = $db->prepare("INSERT INTO banque_pret (id_client, id_agent, id_type_pret, montant, statut) VALUES (?, ?, ?, ?, 'valide')");
+        $stmt->execute([$idClient, $idAgent, $idTypePret, $montant]);
+    }
+
+    public static function existe($taux, $duree) {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT id FROM banque_type_pret WHERE taux_interet = ? AND duree_mois = ?");
+        $stmt->execute([$taux, $duree]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function ajouterType($nom, $taux, $duree) {
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO banque_type_pret (nom, taux_interet, duree_mois) VALUES (?, ?, ?)");
+        return $stmt->execute([$nom, $taux, $duree]);
     }
 }

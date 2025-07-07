@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../models/Etudiant.php';
-require_once __DIR__ . '/../helpers/Utils.php';
 
 
 

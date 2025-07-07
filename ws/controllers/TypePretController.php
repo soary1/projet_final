@@ -2,7 +2,6 @@
 
 
 require_once __DIR__ . '/../models/TypePretController.php';
-require_once __DIR__ . '/../helpers/Utils.php';
 
 class TypePretController 
 {

@@ -2,23 +2,33 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Mes Prêts</title>
+  <title>Les Prêts</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background-color: #f2f2f2; }
+    button { padding: 5px 10px; }
+    select { margin-bottom: 10px; padding: 5px; }
   </style>
 </head>
 <body>
-  <h1>Mes Prêts</h1>
 
+  <h1>Les Prêts</h1>
   <a href="ajouter_pret.html">➕ Ajouter un prêt</a>
+
+  <div>
+    <label for="filtre-client">Filtrer par client :</label>
+    <select id="filtre-client" onchange="filtrerParClient()">
+      <option value="">-- Tous les clients --</option>
+    </select>
+  </div>
 
   <table id="table-prets">
     <thead>
       <tr>
-        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th>
+        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -39,29 +49,145 @@
       xhr.send(data);
     }
 
-    function chargerPrets() {
-      ajax("GET", "/prets", null, (data) => {
-        const tbody = document.querySelector("#table-prets tbody");
-        tbody.innerHTML = "";
-        data.forEach(p => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${p.id}</td>
-            <td>${p.id_client}</td>
-<<<<<<< Updated upstream
-            <td>${p.id_type_pret}</td>
-=======
-            <td>${p.type_pret}</td>
->>>>>>> Stashed changes
-            <td>${p.montant}</td>
-            <td>${p.statut}</td>
-            <td>${p.date_demande}</td>
-          `;
-          tbody.appendChild(tr);
+    function formatAr(n) {
+      return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function chargerClients() {
+      ajax("GET", "/clients", null, (data) => {
+        const select = document.getElementById("filtre-client");
+        data.forEach(client => {
+          const option = document.createElement("option");
+          option.value = client.id;
+          option.textContent = client.nom_utilisateur;
+          select.appendChild(option);
         });
       });
     }
 
+function chargerPrets(idClient = "") {
+  const url = idClient ? `/clients/${idClient}/prets` : "/prets";
+  ajax("GET", url, null, (data) => {
+    const tbody = document.querySelector("#table-prets tbody");
+    tbody.innerHTML = "";
+    data.forEach(p => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${p.id}</td>
+        <td>${p.id_client}</td>
+<td>${p.nom_type_pret}</td>
+        <td>${formatAr(p.montant)} Ar</td>
+        <td>${p.statut || 'en attente'}</td>
+        <td>${p.date_demande}</td>
+        <td><button onclick="exporterPDF(${p.id}, ${p.id_client}, '${p.id_type_pret}', ${p.montant}, '${p.date_demande}')">📄 PDF</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+
+
+    function filtrerParClient() {
+      const clientId = document.getElementById("filtre-client").value;
+      chargerPrets(clientId);
+    }
+
+    function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
+      ajax("GET", `/client/${clientId}`, null, (clientData) => {
+        const nomClient = clientData.nom_utilisateur;
+
+        ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
+          const taux_annuel = parseFloat(typeData.taux_interet);
+          const duree_mois = parseInt(typeData.duree_mois);
+          const nom = typeData.nom;
+          const taux_mensuel = taux_annuel / 100 / 12;
+
+          const mensualite_amortissable = (montant * taux_mensuel) /
+            (1 - Math.pow(1 + taux_mensuel, -duree_mois));
+          const total_amortissable = mensualite_amortissable * duree_mois;
+
+          const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
+          const total_simple = montant + interet_simple_total;
+          const mensualite_simple = total_simple / duree_mois;
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          doc.setFillColor(44, 62, 80);
+          doc.rect(0, 0, 210, 25, 'F');
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(18);
+          doc.setFont("helvetica", "bold");
+          doc.text("BANQUE NATIONALE DE PRÊT", 15, 17);
+
+          doc.setFillColor(255, 255, 255);
+          doc.circle(190, 12, 6, 'F');
+          doc.setTextColor(44, 62, 80);
+          doc.setFontSize(8);
+          doc.text("BNP", 187, 14);
+
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(16);
+          doc.setFont("helvetica", "bold");
+          doc.text("RELEVÉ DE PRÊT", 15, 35);
+          doc.setDrawColor(160);
+          doc.line(15, 38, 195, 38);
+
+          let y = 45;
+          doc.setFontSize(13);
+          doc.setFont("helvetica", "bold");
+          doc.text("Informations du Client", 15, y); y += 8;
+
+          doc.setFontSize(12);
+          doc.setFont("helvetica", "normal");
+          doc.text(`Nom du Client : ${nomClient}`, 20, y); y += 7;
+          doc.text(`Type de Prêt : ${nom}`, 20, y); y += 7;
+          doc.text(`Montant : ${formatAr(montant)} Ar`, 20, y); y += 7;
+          const dateSansHeure = dateDemande.split(" ")[0];
+          doc.text(`Date de Demande : ${dateSansHeure}`, 20, y); y += 7;
+          doc.text(`Durée : ${duree_mois} mois`, 20, y); y += 7;
+          doc.text(`Taux Annuel : ${taux_annuel}%`, 20, y); y += 12;
+
+          doc.setDrawColor(200);
+          doc.line(15, y, 195, y); y += 10;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.setTextColor(0, 51, 102);
+          doc.text("Simulation - Intérêt Composé", 15, y); y += 8;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`Mensualité estimée : ${formatAr(mensualite_amortissable)} Ar`, 20, y); y += 7;
+          doc.text(`Total à rembourser : ${formatAr(total_amortissable)} Ar`, 20, y); y += 12;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.setTextColor(102, 0, 0);
+          doc.text("Simulation - Intérêt Simple", 15, y); y += 8;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`Mensualité estimée : ${formatAr(mensualite_simple)} Ar`, 20, y); y += 7;
+          doc.text(`Total à rembourser : ${formatAr(total_simple)} Ar`, 20, y); y += 15;
+
+          doc.setDrawColor(180);
+          doc.line(15, y, 195, y); y += 10;
+
+          doc.setFontSize(10);
+          doc.setTextColor(120);
+          doc.text("Document confidentiel généré automatiquement – Ne pas divulguer", 15, 285);
+          doc.text("Page 1 / 1", 200, 285, { align: 'right' });
+
+          doc.save(`releve_pret_${id}.pdf`);
+        });
+      });
+    }
+
+    chargerClients();
     chargerPrets();
   </script>
 </body>

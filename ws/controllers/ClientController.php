@@ -38,4 +38,13 @@ class ClientController
         $id = TypePret::create($d['libelle'], $d['taux']);
         Flight::json(['id' => $id], 201);
     }
+
+    public static function getClientById($id): void {
+        $client = Client::find((int)$id);
+        if ($client) {
+            Flight::json($client);
+        } else {
+            Flight::halt(404, "Client introuvable");
+        }
+    }
 }

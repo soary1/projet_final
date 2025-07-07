@@ -3,12 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <title>Accueil - Banque</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
+      background: linear-gradient(to right, #2c3e50, #34495e);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      color: #333;
+      padding: 40px 0;
+    }
+
+    .container-custom {
+      max-width: 1000px;
+      margin: auto;
+      background-color: #fff;
       font-family: sans-serif;
       background-color: #f4f4f4;
       padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
       text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+
+    .nav-links a {
+      margin: 0 10px;
+      padding: 10px 20px;
+      border-radius: 25px;
+      background-color: #3498db;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      background-color: #2980b9;
+    }
+
+    .admin-section {
+      margin-top: 40px;
+    }
+
+    .form-control {
+      margin-bottom: 15px;
+    }
+
+    .btn-custom {
+      background: linear-gradient(to right, #3498db, #2980b9);
+      color: white;
+      font-weight: 600;
+      border: none;
+    }
+
+    .btn-custom:hover {
+      background: linear-gradient(to right, #2980b9, #1c6ca4);
+    }
+
+    table {
+      margin-top: 20px;
+    }
+
+    th, td {
+      text-align: center;
+      vertical-align: middle !important;
+    }
+
+    .table thead {
+      background-color: #f1f1f1;
+    }
+
+    .bi-trash-fill {
+      color: #e74c3c;
+      cursor: pointer;
+    }
+
+    .bi-trash-fill:hover {
+      color: #c0392b;
+    }
+
+    .section-divider {
+      border-top: 2px solid #e0e0e0;
+      margin: 40px 0;
     }
     h1 {
       margin-bottom: 20px;
@@ -43,45 +123,50 @@
   </style>
 </head>
 <body>
+  
 
-  <h1>Bienvenue dans le système bancaire</h1>
+  <div class="container container-custom">
+    <h1 class="page-title">🏦 Système Bancaire - Accueil</h1>
 
+    <div class="nav-links text-center mb-4">
+      <a href="view/client/pres/liste_prets.html">Ajouter un pret</a>
+      <a href="login.html">Agent</a>
+      <a href="login.html">Admin</a>
+    </div>
 <<<<<<< Updated upstream
   <a href="view/client/accueil.html">Client</a>
   <a href="agent.html">Agent</a>
   <a href="admin.html">Admin</a>
 
-  <div class="admin-section">
-    <h2>Gestion des Types de Prêt (Admin)</h2>
-    <input type="text" id="nom_type" placeholder="Nom du prêt">
-    <input type="number" step="0.01" id="taux" placeholder="Taux (%)">
-    <button onclick="ajouterTypePret()">Ajouter</button>
+    <div class="admin-section">
+      <h3>🔧 Gestion des Types de Prêt (Admin)</h3>
+      <div class="row">
+        <div class="col-md-5">
+          <input type="text" id="nom_type" class="form-control" placeholder="Nom du prêt">
+        </div>
+        <div class="col-md-4">
+          <input type="number" step="0.01" id="taux" class="form-control" placeholder="Taux (%)">
+        </div>
+        <div class="col-md-3">
+          <button onclick="ajouterTypePret()" class="btn btn-custom w-100">Ajouter</button>
+        </div>
+      </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Taux (%)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="table-type-pret">
-      </tbody>
-    </table>
-  </div>
-
-  <table id="table-etudiants">
-    <thead>
-      <tr>
-        <th>ID</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Âge</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
+      <table class="table table-bordered table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Taux (%)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="table-type-pret">
+        </tbody>
+      </table>
+    </div>
   <script>
-    const apiBase = "http://localhost/projet_final/ws"; // adapte selon ton projet
+    const apiBase = "http://localhost/projet_final/ws";
 
     function chargerTypesPret() {
       fetch(apiBase + "/typepret")
@@ -95,7 +180,7 @@
               <td>${tp.id}</td>
               <td>${tp.nom}</td>
               <td>${tp.taux_interet}</td>
-              <td><button onclick="supprimerTypePret(${tp.id})">🗑️</button></td>
+              <td><i class="bi bi-trash-fill" onclick="supprimerTypePret(${tp.id})" title="Supprimer"></i></td>
             `;
             tbody.appendChild(row);
           });
@@ -106,44 +191,22 @@
       const nom = document.getElementById("nom_type").value;
       const taux = document.getElementById("taux").value;
 
-      const data = `nom=${encodeURIComponent(nom)}&taux_interet=${encodeURIComponent(taux)}`;
-
-      fetch(apiBase + "/connexion", {
+      fetch(apiBase + "/typepret", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(donnees)
+        body: JSON.stringify({ nom, taux_interet: taux })
       })
       .then(response => response.json())
       .then(data => {
-        if (data.succes && data.role === 'client') {
-          afficherMessage(`Bienvenue ${data.nom} !`, 'success');
-          
-          // Stocker les informations de session
-          sessionStorage.setItem('utilisateur', JSON.stringify({
-            id: data.id,
-            email: email,
-            nom: data.nom,
-            role: 'client',
-            profession: data.profession || '',
-            connecte: true,
-            derniere_connexion: new Date().toISOString()
-          }));
-
-          // Redirection vers l'interface client
-          setTimeout(() => {
-            window.location.href = 'view/client/accueil.html';
-          }, 1500);
-        } else if (data.succes && data.role !== 'client') {
-          afficherMessage('Accès refusé. Ce compte n\'est pas un compte client.', 'error');
+        if (data.success) {
+          chargerTypesPret();
+          document.getElementById("nom_type").value = "";
+          document.getElementById("taux").value = "";
         } else {
-          afficherMessage('Email ou mot de passe incorrect', 'error');
+          alert("Erreur lors de l'ajout.");
         }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        afficherMessage('Erreur de connexion. Vérifiez vos identifiants.', 'error');
       });
     }
 
@@ -156,7 +219,6 @@
       .then(() => chargerTypesPret());
     }
 
-    // Initialisation
     chargerTypesPret();
   </script>
 =======

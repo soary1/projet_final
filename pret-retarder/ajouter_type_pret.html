@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer un Type de Prêt</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 10px;
+      background: #f7f7f7;
+      box-shadow: 0 0 10px #ccc;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      margin-top: 10px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .message {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .ok {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ajouter un Type de Prêt</h1>
+
+  <label for="nom">Nom du prêt</label>
+  <input type="text" id="nom" placeholder="ex: Crédit Immo" required>
+
+  <label for="taux">Taux d’intérêt (%)</label>
+  <input type="number" id="taux" placeholder="ex: 5.5" step="0.01" required>
+
+  <label for="duree">Durée (en mois)</label>
+  <input type="number" id="duree" placeholder="ex: 60" required>
+
+  <label for="delai">Délai avant 1er remboursement (mois)</label>
+  <input type="number" id="delai" placeholder="ex: 3" min="0" value="0">
+
+  <button onclick="ajouterTypePret()">Créer</button>
+
+  <div id="resultat" class="message"></div>
+
+  <script>
+    const api = "http://localhost/projet_final/ws";
+
+    function ajouterTypePret() {
+      const nom = document.getElementById("nom").value.trim();
+      const taux = parseFloat(document.getElementById("taux").value);
+      const duree = parseInt(document.getElementById("duree").value);
+      const delai = parseInt(document.getElementById("delai").value);
+
+      if (!nom || isNaN(taux) || isNaN(duree)) {
+        afficher("Veuillez remplir tous les champs requis", true);
+        return;
+      }
+
+      const data = {
+        nom: nom,
+        taux_interet: taux,
+        duree_mois: duree,
+        delai_defaut: delai
+      };
+
+      fetch(`${api}/typepret`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.id) {
+          afficher("✅ Type de prêt créé avec succès !", false);
+          document.getElementById("nom").value = "";
+          document.getElementById("taux").value = "";
+          document.getElementById("duree").value = "";
+          document.getElementById("delai").value = "0";
+        } else {
+          afficher(res.error || "Erreur inconnue lors de la création", true);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        afficher("Erreur réseau ou serveur", true);
+      });
+    }
+
+    function afficher(message, isError = false) {
+      const div = document.getElementById("resultat");
+      div.className = "message " + (isError ? "error" : "ok");
+      div.textContent = message;
+    }
+  </script>
+
+</body>
+</html>

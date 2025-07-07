@@ -328,7 +328,7 @@
 
           // Redirection vers l'interface client
           setTimeout(() => {
-            window.location.href = 'client.html';
+            window.location.href = 'view/client/accueil.html';
           }, 1500);
         } else if (data.succes && data.role !== 'client') {
           afficherMessage('Accès refusé. Ce compte n\'est pas un compte client.', 'error');

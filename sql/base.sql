@@ -1,3 +1,4 @@
+drop database if exists banque;
 -- Créer la base
 CREATE DATABASE IF NOT EXISTS banque CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE banque;
@@ -53,19 +54,19 @@ CREATE TABLE type_pret (
     duree_mois INT NOT NULL
 );
 
--- Table: pret
 CREATE TABLE pret (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_client INT,
     id_agent INT,
     id_type_pret INT,
     montant DECIMAL(12,2) NOT NULL,
-    date_demande DATE DEFAULT CURRENT_DATE,
+    date_demande DATETIME DEFAULT CURRENT_TIMESTAMP,
     statut VARCHAR(20) DEFAULT 'en attente',
     FOREIGN KEY (id_client) REFERENCES client(id),
     FOREIGN KEY (id_agent) REFERENCES agent(id),
     FOREIGN KEY (id_type_pret) REFERENCES type_pret(id)
 );
+
 
 -- (Optionnel) Table: rôle utilisateur
 CREATE TABLE role (
@@ -73,7 +74,6 @@ CREATE TABLE role (
     nom VARCHAR(50) UNIQUE NOT NULL
 );
 
--- (Optionnel) Table: historique des changements de statut prêt
 CREATE TABLE historique_pret (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_pret INT,

@@ -145,10 +145,10 @@
       </div>
     </div>
 
-    <a href="../index.html"><i class="bi bi-house"></i> Accueil</a>
-    <a href="../client.html"><i class="bi bi-person"></i> Interface Client</a>
-    <a href="../agent.html"><i class="bi bi-briefcase"></i> Interface Agent</a>
-    <a href="#" class="active"><i class="bi bi-gear"></i> Administration</a>
+    <!-- <a href="../../index.html"><i class="bi bi-house"></i> Accueil</a> -->
+    <!-- <a href="../client.html"><i class="bi bi-person"></i> Interface Client</a> -->
+    <!-- <a href="../agent.html"><i class="bi bi-briefcase"></i> Interface Agent</a> -->
+    <!-- <a href="#" class="active"><i class="bi bi-gear"></i> Administration</a> -->
     
     <!-- Bouton de déconnexion -->
     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
@@ -433,7 +433,7 @@
       if (userData.role !== 'admin') {
         afficherMessage('Accès non autorisé pour ce type de compte', 'error');
         setTimeout(() => {
-          window.location.href = '../index.html';
+          window.location.href = '../../index.html';
         }, 2000);
         return;
       }
@@ -452,7 +452,7 @@
         sessionStorage.removeItem('utilisateur');
         afficherMessage('Déconnexion réussie', 'success');
         setTimeout(() => {
-          window.location.href = '../index.html';
+          window.location.href = '../../index.html';
         }, 1500);
       }
     }

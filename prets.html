@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Liste des prêts - Agent</title>
+  <style>
+    body { font-family: sans-serif; padding: 40px; }
+    h1 { text-align: center; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Prêts en attente</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Email</th>
+        <th>Type de prêt</th>
+        <th>Montant</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="table-prets">
+    </tbody>
+  </table>
+
+  <script>
+    const apiBase = "http://localhost/projet_final/ws";
+
+    function chargerPrets() {
+      fetch(apiBase + "/prets/en-attente")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("table-prets");
+          tbody.innerHTML = "";
+          data.forEach(p => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${p.nom_client}</td>
+              <td>${p.email}</td>
+              <td>${p.type_pret}</td>
+              <td>${p.montant} Ar</td>
+              <td>${new Date(p.date_demande).toLocaleString()}</td>
+              <td>
+                <button onclick="validerPret(${p.id})">✅ Valider</button>
+                <button onclick="refuserPret(${p.id})">❌ Refuser</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+    }
+
+    function validerPret(id) {
+      fetch(`${apiBase}/pret/valider/${id}`, { method: "POST" })
+        .then(res => res.json())
+        .then(() => chargerPrets());
+    }
+
+    function refuserPret(id) {
+      fetch(`${apiBase}/pret/refuser/${id}`, { method: "POST" })
+        .then(res => res.json())
+        .then(() => chargerPrets());
+    }
+
+    chargerPrets();
+  </script>
+
+</body>
+</html>

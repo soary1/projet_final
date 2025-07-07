@@ -2,40 +2,74 @@
 require 'vendor/autoload.php';
 require 'db.php';
 
-Flight::route('GET /etudiants', function() {
+Flight::route('GET /prets/en-attente', function () {
     $db = getDB();
-    $stmt = $db->query("SELECT * FROM etudiant");
+    $stmt = $db->query("
+        SELECT p.id, c.id AS id_client, u.nom AS nom_client, u.email,
+               tp.nom AS type_pret, p.montant, p.date_demande, p.statut
+        FROM banque_pret p
+        JOIN banque_client c ON p.id_client = c.id
+        JOIN banque_utilisateur u ON c.id_utilisateur = u.id
+        JOIN banque_type_pret tp ON p.id_type_pret = tp.id
+        WHERE p.statut = 'en attente'
+    ");
     Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
 });
 
-Flight::route('GET /etudiants/@id', function($id) {
+Flight::route('POST /pret/valider/@id', function ($id) {
     $db = getDB();
-    $stmt = $db->prepare("SELECT * FROM etudiant WHERE id = ?");
+
+    // Mettre à jour le statut
+    $stmt = $db->prepare("UPDATE banque_pret SET statut = 'valide' WHERE id = ?");
     $stmt->execute([$id]);
-    Flight::json($stmt->fetch(PDO::FETCH_ASSOC));
+
+    // Historique
+    $stmtHist = $db->prepare("
+        INSERT INTO banque_historique_pret (id_pret, ancien_statut, nouveau_statut)
+        VALUES (?, 'en attente', 'valide')
+    ");
+    $stmtHist->execute([$id]);
+
+    Flight::json(['message' => 'Prêt validé']);
 });
 
-Flight::route('POST /etudiants', function() {
-    $data = Flight::request()->data;
+Flight::route('POST /pret/refuser/@id', function ($id) {
     $db = getDB();
-    $stmt = $db->prepare("INSERT INTO etudiant (nom, prenom, email, age) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$data->nom, $data->prenom, $data->email, $data->age]);
-    Flight::json(['message' => 'Étudiant ajouté', 'id' => $db->lastInsertId()]);
-});
 
-Flight::route('PUT /etudiants/@id', function($id) {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE etudiant SET nom = ?, prenom = ?, email = ?, age = ? WHERE id = ?");
-    $stmt->execute([$data->nom, $data->prenom, $data->email, $data->age, $id]);
-    Flight::json(['message' => 'Étudiant modifié']);
-});
-
-Flight::route('DELETE /etudiants/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM etudiant WHERE id = ?");
+    $stmt = $db->prepare("UPDATE banque_pret SET statut = 'refuse' WHERE id = ?");
     $stmt->execute([$id]);
-    Flight::json(['message' => 'Étudiant supprimé']);
+
+    $stmtHist = $db->prepare("
+        INSERT INTO banque_historique_pret (id_pret, ancien_statut, nouveau_statut)
+        VALUES (?, 'en attente', 'refuse')
+    ");
+    $stmtHist->execute([$id]);
+
+    Flight::json(['message' => 'Prêt refusé']);
+});
+
+Flight::route('GET /typefond', function () {
+    $db = getDB();
+    $stmt = $db->query("SELECT * FROM banque_type_fond");
+    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+});
+
+
+Flight::route('POST /fond', function () {
+    parse_str(file_get_contents("php://input"), $data);
+
+    $montant = $data['montant'] ?? null;
+    $id_type_fond = $data['id_type_fond'] ?? null;
+    $id_agent = $data['id_agent'] ?? null;
+
+    $db = getDB();
+    $stmt = $db->prepare("
+        INSERT INTO banque_fond (montant, id_type_fond, id_agent)
+        VALUES (?, ?, ?)
+    ");
+    $stmt->execute([$montant, $id_type_fond, $id_agent]);
+
+    Flight::json(['message' => 'Fond ajouté']);
 });
 
 Flight::start();

@@ -27,4 +27,30 @@ class PretController {
         Pret::ajouterFond($data);
         Flight::json(['message' => 'Fond ajouté']);
     }
+
+    public static function ajouterType() {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'])) {
+            Flight::json(['success' => false, 'message' => 'Paramètres manquants.'], 400);
+            return;
+        }
+
+        $nom = trim($data['nom']);
+        $taux = floatval($data['taux_interet']);
+        $duree = intval($data['duree_mois']);
+
+        $dejaExistant = Pret::existe($taux, $duree);
+        if ($dejaExistant) {
+            Flight::json(['success' => false, 'message' => 'Type de prêt similaire existe déjà.'], 409);
+            return;
+        }
+
+        $ok = Pret::ajouterType($nom, $taux, $duree);
+        if ($ok) {
+            Flight::json(['success' => true, 'message' => 'Type de prêt ajouté avec succès.']);
+        } else {
+            Flight::json(['success' => false, 'message' => 'Erreur lors de l\'ajout.'], 500);
+        }
+    }
 }

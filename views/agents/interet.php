@@ -100,7 +100,7 @@
     </tfoot>
   </table>
 
-  <h3 style="margin-top: 50px;">📊 Illustration du graphique des intérêts mensuels (Simple vs Composé)</h3>
+  <h3 style="margin-top: 50px;">📊 Graphique des intérêts mensuels (Simple vs Composé)</h3>
   <canvas id="interetChart" width="800" height="300"></canvas>
 
   <script>
@@ -166,18 +166,18 @@
                 {
                   label: "Intérêt simple",
                   data: labels.map(mois => simples[mois] || 0),
-                  borderColor: "orange",
-                  backgroundColor: "orange",
-                  fill: false,
-                  tension: 0.3
+                  borderColor: "blue",
+                  backgroundColor: "rgba(0, 0, 255, 0.2)",
+                  tension: 0.4,
+                  fill: false
                 },
                 {
                   label: "Intérêt composé",
                   data: labels.map(mois => composes[mois] || 0),
-                  borderColor: "orangered",
-                  backgroundColor: "orangered",
-                  fill: false,
-                  tension: 0.3
+                  borderColor: "red",
+                  backgroundColor: "rgba(255, 0, 0, 0.2)",
+                  tension: 0.4,
+                  fill: false
                 }
               ]
             },
@@ -186,7 +186,7 @@
               plugins: {
                 title: {
                   display: true,
-                  text: "Comparaison des intérêts mensuels (simple vs composé)"
+                  text: "Comparaison des intérêts mensuels"
                 }
               },
               scales: {
@@ -194,7 +194,7 @@
                   beginAtZero: true,
                   title: {
                     display: true,
-                    text: "Montant des intérêts (Ar)"
+                    text: "Montants (Ar)"
                   }
                 },
                 x: {
@@ -219,7 +219,6 @@
       chargerInterets(mois_debut, annee_debut, mois_fin, annee_fin);
     });
 
-    // Chargement initial
     window.onload = () => chargerInterets();
   </script>
 </body>

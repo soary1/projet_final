@@ -15,8 +15,7 @@ class Interet {
             $params = [$dateDebut, $dateFin];
         }
 
-        $stmt = $db->prepare("
-            SELECT 
+        $stmt = $db->prepare("SELECT 
                 p.id AS id_pret,
                 u.nom AS nom_client,
                 p.montant,
@@ -28,8 +27,8 @@ class Interet {
             JOIN banque_utilisateur u ON u.id = c.id_utilisateur
             JOIN banque_type_pret t ON t.id = p.id_type_pret
             $where
-            ORDER BY p.date_demande ASC
-        ");
+            ORDER BY p.date_demande ASC");
+
         $stmt->execute($params);
         $prets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -41,13 +40,18 @@ class Interet {
             $duree = intval($pret['duree_mois']);
             $taux_mensuel = $taux_annuel / 100 / 12;
 
-            // Intérêt simple
             $interet_simple_total = $montant * ($taux_annuel / 100) * ($duree / 12);
             $interet_simple_mensuel = $interet_simple_total / $duree;
 
-            // Intérêt composé
-            $interet_compose_total = $montant * pow(1 + $taux_mensuel, $duree) - $montant;
-            $interet_compose_mensuel = $interet_compose_total / $duree;
+            if ($taux_mensuel > 0 && $duree > 0) {
+                $mensualite = $montant * $taux_mensuel / (1 - pow(1 + $taux_mensuel, -$duree));
+                $total_rembourse = $mensualite * $duree;
+                $interet_compose_total = $total_rembourse - $montant;
+                $interet_compose_mensuel = $interet_compose_total / $duree;
+            } else {
+                $interet_compose_total = 0;
+                $interet_compose_mensuel = 0;
+            }
 
             $resultats[] = [
                 'id_pret' => $pret['id_pret'],

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion Banque</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      max-width: 400px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .message {
+      padding: 10px;
+      margin-top: 15px;
+      text-align: center;
+      display: none;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .erreur {
+      background: #ffdddd;
+      color: #900;
+      border: 1px solid red;
+      font-weight: bold;
+    }
+
+    .ok {
+      background: #ddffdd;
+      color: #090;
+      border: 1px solid green;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Connexion</h1>
+
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="mot_de_passe" placeholder="Mot de passe" required>
+  <button onclick="connexion()">Se connecter</button>
+
+  <div id="resultat" class="message"></div>
+
+  <script>
+    const api = "http://localhost/projet_final/ws"; // À adapter selon ton serveur
+
+    function connexion() {
+      const email = document.getElementById("email").value.trim();
+      const mot_de_passe = document.getElementById("mot_de_passe").value;
+
+      console.log("Tentative de connexion avec :", { email, mot_de_passe });
+
+      if (!email || !mot_de_passe) {
+        afficher("Veuillez remplir tous les champs.", true);
+        return;
+      }
+
+      fetch(`${api}/connexion`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, mot_de_passe })
+      })
+      .then(async res => {
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.warn("Erreur HTTP :", res.status, data);
+          afficher(data.message || `Erreur ${res.status}`, true);
+          return;
+        }
+
+        if (data.succes) {
+          afficher(`✅ Bienvenue ${data.nom} (${data.role})`, false);
+          console.log("Utilisateur connecté :", data);
+
+          // Optionnel : redirection selon le rôle
+          // if (data.role === 'admin') window.location.href = "admin.html";
+          // else if (data.role === 'agent') window.location.href = "agent.html";
+          // else window.location.href = "client.html";
+        } else {
+          afficher(data.message || "Connexion échouée.", true);
+        }
+      })
+      .catch(err => {
+        console.error("Erreur JS/fetch :", err);
+        afficher("⚠️ Erreur technique ou serveur injoignable", true);
+      });
+    }
+
+    function afficher(message, erreur = false) {
+      const box = document.getElementById("resultat");
+      box.style.display = "block";
+      box.className = "message " + (erreur ? "erreur" : "ok");
+      box.textContent = message;
+    }
+  </script>
+
+</body>
+</html>

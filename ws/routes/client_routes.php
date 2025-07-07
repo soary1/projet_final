@@ -15,3 +15,4 @@ Flight::route('POST /types-pret',         ['TypePretController', 'createTypePret
 Flight::route('GET /clients/@id/prets',   ['Pret', 'listPretByClient']);
 Flight::route('POST /clients/@id/prets',  ['Pret', 'createPret']);
 Flight::route('DELETE /prets/@id',        ['Pret', 'deletePret']);
+Flight::route('GET /client/@id', ['ClientController', 'getClientById']);

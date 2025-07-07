@@ -61,49 +61,54 @@
     }
 
     function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
-  ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
-    const taux_annuel = parseFloat(typeData.taux_interet); // exemple : 12
-    const duree_mois = parseInt(typeData.duree_mois);      // exemple : 24
+  ajax("GET", `/client/${clientId}`, null, (clientData) => {
+const nomClient = clientData.nom_utilisateur;
 
-    // ✅ Calculs pour amortissable (mensualité constante)
-    const taux_mensuel = taux_annuel / 100 / 12;
-    const mensualite_amortissable = (montant * taux_mensuel) / (1 - Math.pow(1 + taux_mensuel, -duree_mois));
-    const total_amortissable = mensualite_amortissable * duree_mois;
+    ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
+      const taux_annuel = parseFloat(typeData.taux_interet);
+      const duree_mois = parseInt(typeData.duree_mois);
 
-    // ✅ Calculs pour intérêt simple
-    const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
-    const total_simple = montant + interet_simple_total;
-    const mensualite_simple = total_simple / duree_mois;
+      const taux_mensuel = taux_annuel / 100 / 12;
 
-    // ✅ Génération du PDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+      const mensualite_amortissable = (montant * taux_mensuel) /
+        (1 - Math.pow(1 + taux_mensuel, -duree_mois));
+      const total_amortissable = mensualite_amortissable * duree_mois;
 
-    doc.setFontSize(16);
-    doc.text("Détails du Prêt", 20, 20);
-    doc.setFontSize(12);
-    doc.text(`ID Prêt : ${id}`, 20, 40);
-    doc.text(`Client ID : ${clientId}`, 20, 50);
-    doc.text(`Type de Prêt : ${typePretId}`, 20, 60);
-    doc.text(`Montant : ${montant.toFixed(2)} Ar`, 20, 70);
-    doc.text(`Date de Demande : ${dateDemande}`, 20, 80);
-    doc.text(`Durée : ${duree_mois} mois`, 20, 90);
-    doc.text(`Taux Annuel : ${taux_annuel}%`, 20, 100);
+      const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
+      const total_simple = montant + interet_simple_total;
+      const mensualite_simple = total_simple / duree_mois;
 
-    doc.setFontSize(13);
-    doc.text("➤ Mode Amortissable :", 20, 120);
-    doc.setFontSize(12);
-    doc.text(`Mensualité : ${mensualite_amortissable.toFixed(2)} Ar`, 25, 130);
-    doc.text(`Total à rembourser : ${total_amortissable.toFixed(2)} Ar`, 25, 140);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-    doc.setFontSize(13);
-    doc.text("➤ Intérêt Simple :", 20, 160);
-    doc.setFontSize(12);
-    doc.text(`Mensualité : ${mensualite_simple.toFixed(2)} Ar`, 25, 170);
-    doc.text(`Total à rembourser : ${total_simple.toFixed(2)} Ar`, 25, 180);
+      doc.setFontSize(16);
+      doc.text("Détails du Prêt", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`ID Prêt : ${id}`, 20, 40);
+      doc.text(`Client : ${nomClient}`, 20, 50);
+      doc.text(`Type de Prêt ID : ${typePretId}`, 20, 60);
+      doc.text(`Montant : ${montant.toFixed(2)} Ar`, 20, 70);
+      doc.text(`Date de Demande : ${dateDemande}`, 20, 80);
+      doc.text(`Durée : ${duree_mois} mois`, 20, 90);
+      doc.text(`Taux Annuel : ${taux_annuel}%`, 20, 100);
 
-    doc.save(`pret_${id}.pdf`);
+      doc.setFontSize(13);
+      doc.text("➤ Mode Amortissable :", 20, 120);
+      doc.setFontSize(12);
+      doc.text(`Mensualité : ${mensualite_amortissable.toFixed(2)} Ar`, 25, 130);
+      doc.text(`Total à rembourser : ${total_amortissable.toFixed(2)} Ar`, 25, 140);
+
+      
+      doc.setFontSize(13);
+      doc.text("➤ Intérêt Simple :", 20, 160);
+      doc.setFontSize(12);
+      doc.text(`Mensualité : ${mensualite_simple.toFixed(2)} Ar`, 25, 170);
+      doc.text(`Total à rembourser : ${total_simple.toFixed(2)} Ar`, 25, 180);
+
+      doc.save(`pret_${id}.pdf`);
+    });
   });
+
 }
 
 

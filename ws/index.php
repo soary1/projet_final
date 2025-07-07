@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
+<<<<<<< Updated upstream
 
 // Route de connexion
 Flight::route('POST /connexion', function() {
@@ -272,6 +273,9 @@ Flight::route('POST /prets', function () {
 
     Flight::json(['message' => 'Prêt ajouté', 'id' => $db->lastInsertId()]);
 });
+=======
+require 'routes/etudiant_routes.php';
+>>>>>>> Stashed changes
 
 /* PUT /prets/{id}   → modifier un prêt */
 Flight::route('PUT /prets/@id', function ($id) {

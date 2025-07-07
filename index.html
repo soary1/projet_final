@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion Client - Banque</title>
+<<<<<<< Updated upstream
+  <title>Accueil - Banque</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -197,111 +198,105 @@
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
-      border-left: 4px solid #3498db;
+      border-collapse: collapse;
     }
 
-    .client-features h4 {
-      margin: 0 0 10px 0;
-      color: #2c3e50;
-      font-size: 14px;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
     }
 
-    .client-features ul {
-      margin: 0;
-      padding-left: 20px;
-      font-size: 13px;
-      color: #5d6d7e;
+    th {
+      background-color: #eee;
     }
+=======
+  <title>Gestion des étudiants</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { margin: 5px; padding: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+>>>>>>> Stashed changes
   </style>
 </head>
 <body>
 
-  <a href="index.html" class="back-home">← Retour à l'accueil</a>
+<<<<<<< Updated upstream
+  <h1>Bienvenue dans le système bancaire</h1>
 
   <a href="view/client/accueil.html">Client</a>
   <a href="agent.html">Agent</a>
   <a href="admin.html">Admin</a>
 
-    <div class="message" id="message"></div>
+  <div class="admin-section">
+    <h2>Gestion des Types de Prêt (Admin)</h2>
+    <input type="text" id="nom_type" placeholder="Nom du prêt">
+    <input type="number" step="0.01" id="taux" placeholder="Taux (%)">
+    <button onclick="ajouterTypePret()">Ajouter</button>
 
-    <form id="loginForm" onsubmit="return false;">
-      <div class="form-group">
-        <label for="email">Adresse email :</label>
-        <input type="email" id="email" name="email" required placeholder="votre@email.com">
-      </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Taux (%)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="table-type-pret">
+      </tbody>
+    </table>
+=======
+  <h1>Gestion des étudiants</h1>
 
-      <div class="form-group">
-        <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="password" required placeholder="••••••••">
-      </div>
-
-      <button type="button" class="login-button" onclick="seConnecterClient()">
-        🔓 Accéder à mon espace
-      </button>
-    </form>
-
-    <div class="client-features">
-      <h4>💼 Services clients :</h4>
-      <ul>
-        <li>Consultation de vos comptes</li>
-        <li>Historique des transactions</li>
-        <li>Demandes de prêts</li>
-        <li>Gestion du profil</li>
-        <li>Suivi des dossiers</li>
-      </ul>
-    </div>
-
-    <div class="client-info">
-      <h4>🔒 Sécurité de vos données :</h4>
-      <ul>
-        <li>Connexion sécurisée SSL</li>
-        <li>Données bancaires protégées</li>
-        <li>Authentification forte</li>
-        <li>Session sécurisée</li>
-      </ul>
-    </div>
-
-    <div class="demo-account">
-      <h4>💾 Compte de test :</h4>
-      <p>Utilisez votre compte client enregistré</p>
-      <p><em>Identifiants stockés de manière sécurisée</em></p>
-    </div>
+  <div>
+    <input type="hidden" id="id">
+    <input type="text" id="nom" placeholder="Nom">
+    <input type="text" id="prenom" placeholder="Prénom">
+    <input type="email" id="email" placeholder="Email">
+    <input type="number" id="age" placeholder="Âge">
+    <button onclick="ajouterOuModifier()">Ajouter / Modifier</button>
+>>>>>>> Stashed changes
   </div>
 
+  <table id="table-etudiants">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Âge</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
   <script>
-    const apiBase = "http://localhost/projet_final/ws";
+<<<<<<< Updated upstream
+    const apiBase = "http://localhost/projet_final/ws"; // adapte selon ton projet
 
-    function afficherMessage(texte, type) {
-      const messageEl = document.getElementById('message');
-      messageEl.textContent = texte;
-      messageEl.className = `message ${type}`;
-      messageEl.style.display = 'block';
-
-      setTimeout(() => {
-        messageEl.style.display = 'none';
-      }, 5000);
+    function chargerTypesPret() {
+      fetch(apiBase + "/typepret")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("table-type-pret");
+          tbody.innerHTML = "";
+          data.forEach(tp => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${tp.id}</td>
+              <td>${tp.nom}</td>
+              <td>${tp.taux_interet}</td>
+              <td><button onclick="supprimerTypePret(${tp.id})">🗑️</button></td>
+            `;
+            tbody.appendChild(row);
+          });
+        });
     }
 
-    function seConnecterClient() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+    function ajouterTypePret() {
+      const nom = document.getElementById("nom_type").value;
+      const taux = document.getElementById("taux").value;
 
-      // Validation côté client
-      if (!email || !password) {
-        afficherMessage('Veuillez remplir tous les champs', 'error');
-        return;
-      }
-
-      if (!email.includes('@')) {
-        afficherMessage('Veuillez entrer une adresse email valide', 'error');
-        return;
-      }
-
-      // Appel direct à l'API pour vérifier dans la base de données
-      const donnees = {
-        email: email,
-        mot_de_passe: password
-      };
+      const data = `nom=${encodeURIComponent(nom)}&taux_interet=${encodeURIComponent(taux)}`;
 
       fetch(apiBase + "/connexion", {
         method: "POST",
@@ -342,43 +337,102 @@
       });
     }
 
-    // Permettre la soumission avec Enter
-    document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        seConnecterClient();
-      }
-    });
+    function supprimerTypePret(id) {
+      if (!confirm("Supprimer ce type de prêt ?")) return;
 
-    // Vérifier si déjà connecté en tant que client
-    document.addEventListener('DOMContentLoaded', function() {
-      const utilisateur = sessionStorage.getItem('utilisateur');
-      if (utilisateur) {
-        const userData = JSON.parse(utilisateur);
-        if (userData.connecte && userData.role === 'client') {
-          afficherMessage(`Vous êtes déjà connecté`, 'success');
-          setTimeout(() => {
-            window.location.href = 'client.html';
-          }, 2000);
-        }
-      }
-    });
-
-    // Session timeout plus courte pour les clients (15 minutes)
-    let inactivityTimer;
-    function resetInactivityTimer() {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        sessionStorage.removeItem('utilisateur');
-        afficherMessage('Session expirée', 'error');
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 2000);
-      }, 15 * 60 * 1000); // 15 minutes
+      fetch(apiBase + `/typepret/${id}`, {
+        method: "DELETE"
+      })
+      .then(() => chargerTypesPret());
     }
 
-    // Réinitialiser le timer sur activité
-    document.addEventListener('mousemove', resetInactivityTimer);
-    document.addEventListener('keypress', resetInactivityTimer);
+    // Initialisation
+    chargerTypesPret();
+=======
+    const apiBase = "http://localhost:8888/tp-flightphp-crud/ws";
+
+    function ajax(method, url, data, callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, apiBase + url, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          callback(JSON.parse(xhr.responseText));
+        }
+      };
+      xhr.send(data);
+    }
+
+    function chargerEtudiants() {
+      ajax("GET", "/etudiants", null, (data) => {
+        const tbody = document.querySelector("#table-etudiants tbody");
+        tbody.innerHTML = "";
+        data.forEach(e => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${e.id}</td>
+            <td>${e.nom}</td>
+            <td>${e.prenom}</td>
+            <td>${e.email}</td>
+            <td>${e.age}</td>
+            <td>
+              <button onclick='remplirFormulaire(${JSON.stringify(e)})'>✏️</button>
+              <button onclick='supprimerEtudiant(${e.id})'>🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    function ajouterOuModifier() {
+      const id = document.getElementById("id").value;
+      const nom = document.getElementById("nom").value;
+      const prenom = document.getElementById("prenom").value;
+      const email = document.getElementById("email").value;
+      const age = document.getElementById("age").value;
+
+      const data = `nom=${encodeURIComponent(nom)}&prenom=${encodeURIComponent(prenom)}&email=${encodeURIComponent(email)}&age=${age}`;
+
+      if (id) {
+        ajax("PUT", `/etudiants/${id}`, data, () => {
+          resetForm();
+          chargerEtudiants();
+        });
+      } else {
+        ajax("POST", "/etudiants", data, () => {
+          resetForm();
+          chargerEtudiants();
+        });
+      }
+    }
+
+    function remplirFormulaire(e) {
+      document.getElementById("id").value = e.id;
+      document.getElementById("nom").value = e.nom;
+      document.getElementById("prenom").value = e.prenom;
+      document.getElementById("email").value = e.email;
+      document.getElementById("age").value = e.age;
+    }
+
+    function supprimerEtudiant(id) {
+      if (confirm("Supprimer cet étudiant ?")) {
+        ajax("DELETE", `/etudiants/${id}`, null, () => {
+          chargerEtudiants();
+        });
+      }
+    }
+
+    function resetForm() {
+      document.getElementById("id").value = "";
+      document.getElementById("nom").value = "";
+      document.getElementById("prenom").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("age").value = "";
+    }
+
+    chargerEtudiants();
+>>>>>>> Stashed changes
   </script>
 
 </body>

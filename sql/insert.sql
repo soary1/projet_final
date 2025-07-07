@@ -1,8 +1,8 @@
 -- Prêts 2024
 INSERT INTO banque_pret (id_client, id_agent, id_type_pret, montant, date_demande, statut) VALUES
-(1, 1, 1, 150000000, '2024-01-10', 'valide'),
-(1, 1, 2, 50000000,  '2024-03-20', 'valide'),
-(1, 1, 3, 30000000,  '2024-06-05', 'valide');
+(2, 1, 1, 150000000, '2024-01-10', 'valide'),
+(2, 1, 2, 50000000,  '2024-03-20', 'valide'),
+(2, 1, 3, 30000000,  '2024-06-05', 'valide');
 
 -- Prêts 2025
 INSERT INTO banque_pret (id_client, id_agent, id_type_pret, montant, date_demande, statut) VALUES

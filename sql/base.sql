@@ -111,7 +111,7 @@ drop database if exists banque;
 
     -- Créer un profil client de test
     INSERT INTO banque_client (id_utilisateur, profession, revenu_mensuel) VALUES 
-    (3, 'Ingénieur', 4500.00);
+    (2, 'Ingénieur', 4500.00);
 
     -- Ajouter quelques types de prêts par défaut
     INSERT INTO banque_type_pret (nom, taux_interet, duree_mois) VALUES

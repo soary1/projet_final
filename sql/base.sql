@@ -130,3 +130,6 @@ drop database if exists banque;
     ('Client'),
     ('Agent'),
     ('Administrateur');
+
+
+alter table banque_type_pret add column assurance DECIMAL(5,2) DEFAULT 0.00;

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ajouter un Prêt</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, select, button { margin: 5px; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Ajouter un Prêt</h1>
+
+  <div>
+    <input type="number" id="id_client" placeholder="ID Client">
+    <select id="id_type_pret"></select>
+    <input type="number" id="montant" placeholder="Montant">
+    <button onclick="ajouterPret()">Soumettre</button>
+    <a href="liste_prets.html">Voir mes prêts</a>
+  </div>
+
+  <script>
+    const apiBase = "http://localhost/projet_final/ws";
+
+    function ajax(method, url, data, callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, apiBase + url, true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          callback && callback(JSON.parse(xhr.responseText));
+        }
+      };
+      xhr.send(data);
+    }
+
+    function chargerTypesPret() {
+      ajax("GET", "/typepret", null, (data) => {
+        const select = document.getElementById("id_type_pret");
+        data.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.textContent = t.nom;
+          select.appendChild(opt);
+        });
+      });
+    }
+
+    function ajouterPret() {
+      const id_client = document.getElementById("id_client").value;
+      const id_type_pret = document.getElementById("id_type_pret").value;
+      const montant = document.getElementById("montant").value;
+      const data = `id_client=${id_client}&id_type_pret=${id_type_pret}&montant=${montant}`;
+      ajax("POST", "/prets", data, () => {
+        alert("Prêt soumis avec succès !");
+        document.getElementById("id_client").value = "";
+        document.getElementById("montant").value = "";
+        document.getElementById("id_type_pret").value = "";
+      });
+    }
+
+    chargerTypesPret();
+  </script>
+</body>
+</html>

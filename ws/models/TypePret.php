@@ -14,4 +14,10 @@ class TypePret {
         $st->execute([$libelle, $taux]);
         return (int) getDB()->lastInsertId();
     }
+    public static function getById($id) {
+    $st = getDB()->prepare("SELECT * FROM banque_type_pret WHERE id = ?");
+    $st->execute([$id]);
+    return $st->fetch(PDO::FETCH_ASSOC);
+}
+
 }

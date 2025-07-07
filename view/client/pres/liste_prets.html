@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>Mes Prêts</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
     th { background-color: #f2f2f2; }
+    button { padding: 5px 10px; }
   </style>
 </head>
 <body>
   <h1>Mes Prêts</h1>
-
   <a href="ajouter_pret.html">➕ Ajouter un prêt</a>
 
   <table id="table-prets">
     <thead>
       <tr>
-        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th>
+        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -52,11 +53,42 @@
             <td>${p.montant}</td>
             <td>${p.statut}</td>
             <td>${p.date_demande}</td>
+            <td><button onclick="exporterPDF(${p.id}, ${p.id_client}, '${p.id_type_pret}', ${p.montant}, '${p.date_demande}')">📄 PDF</button></td>
           `;
           tbody.appendChild(tr);
         });
       });
     }
+
+    function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
+  ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
+    const taux_annuel = parseFloat(typeData.taux_interet); // ex: 12 (%)
+    const duree_mois = parseInt(typeData.duree_mois); // ex: 24 mois
+
+    const taux_mensuel = taux_annuel / 100 / 12;
+    const mensualite = (montant * taux_mensuel) / (1 - Math.pow(1 + taux_mensuel, -duree_mois));
+    const total_rembourser = mensualite * duree_mois;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Détails du Prêt", 20, 20);
+    doc.setFontSize(12);
+    doc.text(`ID Prêt : ${id}`, 20, 40);
+    doc.text(`Client ID : ${clientId}`, 20, 50);
+    doc.text(`Type de Prêt : ${typePretId}`, 20, 60);
+    doc.text(`Montant : ${montant.toFixed(2)} Ar`, 20, 70);
+    doc.text(`Date de Demande : ${dateDemande}`, 20, 80);
+    doc.text(`Durée : ${duree_mois} mois`, 20, 90);
+    doc.text(`Taux Annuel : ${taux_annuel}%`, 20, 100);
+    doc.text(`Mensualité : ${mensualite.toFixed(2)} Ar`, 20, 110);
+    doc.text(`Total à rembourser : ${total_rembourser.toFixed(2)} Ar`, 20, 120);
+
+    doc.save(`pret_${id}.pdf`);
+  });
+}
+
 
     chargerPrets();
   </script>

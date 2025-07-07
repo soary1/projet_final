@@ -145,14 +145,14 @@
       </div>
     </div>
 
-    <!-- <a href="../../index.html"><i class="bi bi-house"></i> Accueil</a> -->
+    <!-- <a href="../../index.php"><i class="bi bi-house"></i> Accueil</a> -->
     <!-- <a href="../client.html"><i class="bi bi-person"></i> Interface Client</a> -->
     <!-- <a href="../agent.html"><i class="bi bi-briefcase"></i> Interface Agent</a> -->
     <!-- <a href="#" class="active"><i class="bi bi-gear"></i> Administration</a> -->
     
     <!-- Bouton de déconnexion -->
     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-      <a href="#" onclick="seDeconnecter()" style="color: #e74c3c; background-color: rgba(231,76,60,0.1); padding: 10px; border-radius: 6px; text-align: center;">
+      <a href="index.php" style="color: #e74c3c; background-color: rgba(231,76,60,0.1); padding: 10px; border-radius: 6px; text-align: center;">
         <i class="bi bi-box-arrow-right"></i> Déconnexion
       </a>
     </div>
@@ -416,63 +416,9 @@
 
     // Initialisation de la page
     document.addEventListener('DOMContentLoaded', function() {
-      // Vérifier l'authentification au chargement
-      const utilisateur = sessionStorage.getItem('utilisateur');
-      
-      if (!utilisateur) {
-        afficherMessage('Vous devez être connecté pour accéder à cette page', 'error');
-        setTimeout(() => {
-          window.location.href = '../connexion_admin.html';
-        }, 2000);
-        return;
-      }
-
-      const userData = JSON.parse(utilisateur);
-      
-      // Vérifier le rôle
-      if (userData.role !== 'admin') {
-        afficherMessage('Accès non autorisé pour ce type de compte', 'error');
-        setTimeout(() => {
-          window.location.href = '../../index.html';
-        }, 2000);
-        return;
-      }
-
-      // Afficher les informations de l'administrateur
-      document.getElementById('user-info').innerHTML = `👤 ${userData.nom || userData.email}`;
-      
-      // Charger les données
       chargerTypesPret();
       chargerStatistiques();
     });
-
-    // Fonction de déconnexion
-    function seDeconnecter() {
-      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        sessionStorage.removeItem('utilisateur');
-        afficherMessage('Déconnexion réussie', 'success');
-        setTimeout(() => {
-          window.location.href = '../../index.html';
-        }, 1500);
-      }
-    }
-
-    // Session timeout (30 minutes pour admin)
-    let inactivityTimer;
-    function resetInactivityTimer() {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        sessionStorage.removeItem('utilisateur');
-        alert('Session expirée pour des raisons de sécurité');
-        window.location.href = '../connexion_admin.html';
-      }, 30 * 60 * 1000); // 30 minutes
-    }
-
-    // Réinitialiser le timer sur activité
-    document.addEventListener('mousemove', resetInactivityTimer);
-    document.addEventListener('keypress', resetInactivityTimer);
-    document.addEventListener('click', resetInactivityTimer);
-    resetInactivityTimer(); // Démarrer le timer
 
     // Permettre la soumission du formulaire avec Enter
     document.getElementById('duree').addEventListener('keypress', function(e) {

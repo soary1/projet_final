@@ -51,7 +51,11 @@
       const id_type_pret = document.getElementById("id_type_pret").value;
       const montant = document.getElementById("montant").value;
       const data = `id_client=${id_client}&id_type_pret=${id_type_pret}&montant=${montant}`;
+<<<<<<< Updated upstream
       ajax("POST", `/prets/clients/${id_client}`, data, () => {
+=======
+      ajax("POST", "/prets", data, () => {
+>>>>>>> Stashed changes
         alert("Prêt soumis avec succès !");
         document.getElementById("id_client").value = "";
         document.getElementById("montant").value = "";

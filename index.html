@@ -5,197 +5,23 @@
   <title>Accueil - Banque</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .login-container {
-      background-color: white;
+      font-family: sans-serif;
+      background-color: #f4f4f4;
       padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-      max-width: 400px;
-      width: 100%;
-      margin: 20px;
-      border-top: 5px solid #3498db;
-    }
-
-    .login-header {
       text-align: center;
-      margin-bottom: 30px;
     }
-
-    .login-header h1 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
-
-    .login-header p {
-      color: #7f8c8d;
-      margin: 0;
-    }
-
-    .bank-logo {
-      font-size: 48px;
+    h1 {
       margin-bottom: 20px;
     }
-
-    .client-badge {
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 20px;
+    a {
       display: inline-block;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #2c3e50;
-      font-weight: 500;
-    }
-
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-      box-sizing: border-box;
-    }
-
-    input[type="email"]:focus,
-    input[type="password"]:focus {
-      outline: none;
-      border-color: #3498db;
-    }
-
-    .login-button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .login-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-    }
-
-    .login-button:active {
-      transform: translateY(0);
-    }
-
-    .message {
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      text-align: center;
-      display: none;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .client-info {
-      background-color: #e8f4f8;
-      border: 1px solid #b8dce8;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-    }
-
-    .client-info h4 {
-      margin: 0 0 10px 0;
-      color: #2471a3;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-    }
-
-    .client-info ul {
-      margin: 0;
-      padding-left: 20px;
-      font-size: 12px;
-      color: #2471a3;
-    }
-
-    .demo-account {
-      background-color: #d1ecf1;
-      border: 1px solid #bee5eb;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-    }
-
-    .demo-account h4 {
-      margin: 0 0 10px 0;
-      color: #0c5460;
-      font-size: 14px;
-    }
-
-    .demo-account p {
-      margin: 5px 0;
-      font-size: 12px;
-      color: #0c5460;
-      font-family: monospace;
-      background-color: rgba(255, 255, 255, 0.5);
-      padding: 5px;
-      border-radius: 4px;
-    }
-
-    .back-home {
-      position: absolute;
-      top: 20px;
-      left: 20px;
+      margin: 10px;
+      padding: 12px 25px;
+      background-color: #3498db;
       color: white;
       text-decoration: none;
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 10px 15px;
-      border-radius: 20px;
-      font-size: 14px;
-      transition: background-color 0.3s ease;
-    }
-
-    .back-home:hover {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .client-features {
-      background-color: #f8f9fa;
-      padding: 15px;
       border-radius: 8px;
+<<<<<<< Updated upstream
       margin-top: 20px;
       border-collapse: collapse;
     }
@@ -207,6 +33,12 @@
 
     th {
       background-color: #eee;
+=======
+      font-size: 18px;
+    }
+    a:hover {
+      background-color: #2980b9;
+>>>>>>> Stashed changes
     }
   </style>
 </head>
@@ -214,6 +46,7 @@
 
   <h1>Bienvenue dans le système bancaire</h1>
 
+<<<<<<< Updated upstream
   <a href="view/client/accueil.html">Client</a>
   <a href="agent.html">Agent</a>
   <a href="admin.html">Admin</a>
@@ -326,6 +159,12 @@
     // Initialisation
     chargerTypesPret();
   </script>
+=======
+  <a href="views/agents/home.html">Accueil Agent</a>
+  <a href="views/agent/prets.html">Prêts en attente</a>
+  <a href="views/agent/fond.html">Ajouter un fond</a>
+  <a href="views/login.php">Se connecter</a>
+>>>>>>> Stashed changes
 
 </body>
 </html>

@@ -1,4 +1,4 @@
--- Créer la base
+DROP DATABASE IF EXISTS banque;
 CREATE DATABASE IF NOT EXISTS banque CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE banque;
 

@@ -3,252 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <title>Accueil - Banque</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: linear-gradient(to right, #2c3e50, #34495e);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      color: #333;
+      padding: 40px 0;
     }
 
-    .login-container {
-      background-color: white;
+    .container-custom {
+      max-width: 1000px;
+      margin: auto;
+      background-color: #fff;
       padding: 40px;
       border-radius: 15px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-      max-width: 400px;
-      width: 100%;
-      margin: 20px;
-      border-top: 5px solid #3498db;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
 
-    .login-header {
+    .page-title {
       text-align: center;
       margin-bottom: 30px;
-    }
-
-    .login-header h1 {
       color: #2c3e50;
-      margin-bottom: 10px;
-      font-size: 28px;
     }
 
-    .login-header p {
-      color: #7f8c8d;
-      margin: 0;
-    }
-
-    .bank-logo {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-
-    .client-badge {
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: inline-block;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #2c3e50;
-      font-weight: 500;
-    }
-
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-      box-sizing: border-box;
-    }
-
-    input[type="email"]:focus,
-    input[type="password"]:focus {
-      outline: none;
-      border-color: #3498db;
-    }
-
-    .login-button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .login-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-    }
-
-    .login-button:active {
-      transform: translateY(0);
-    }
-
-    .message {
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      text-align: center;
-      display: none;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .client-info {
-      background-color: #e8f4f8;
-      border: 1px solid #b8dce8;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-    }
-
-    .client-info h4 {
-      margin: 0 0 10px 0;
-      color: #2471a3;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-    }
-
-    .client-info ul {
-      margin: 0;
-      padding-left: 20px;
-      font-size: 12px;
-      color: #2471a3;
-    }
-
-    .demo-account {
-      background-color: #d1ecf1;
-      border: 1px solid #bee5eb;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-    }
-
-    .demo-account h4 {
-      margin: 0 0 10px 0;
-      color: #0c5460;
-      font-size: 14px;
-    }
-
-    .demo-account p {
-      margin: 5px 0;
-      font-size: 12px;
-      color: #0c5460;
-      font-family: monospace;
-      background-color: rgba(255, 255, 255, 0.5);
-      padding: 5px;
-      border-radius: 4px;
-    }
-
-    .back-home {
-      position: absolute;
-      top: 20px;
-      left: 20px;
+    .nav-links a {
+      margin: 0 10px;
+      padding: 10px 20px;
+      border-radius: 25px;
+      background-color: #3498db;
       color: white;
       text-decoration: none;
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 10px 15px;
-      border-radius: 20px;
-      font-size: 14px;
+      font-weight: 500;
       transition: background-color 0.3s ease;
     }
 
-    .back-home:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+    .nav-links a:hover {
+      background-color: #2980b9;
     }
 
-    .client-features {
-      background-color: #f8f9fa;
-      padding: 15px;
-      border-radius: 8px;
+    .admin-section {
+      margin-top: 40px;
+    }
+
+    .form-control {
+      margin-bottom: 15px;
+    }
+
+    .btn-custom {
+      background: linear-gradient(to right, #3498db, #2980b9);
+      color: white;
+      font-weight: 600;
+      border: none;
+    }
+
+    .btn-custom:hover {
+      background: linear-gradient(to right, #2980b9, #1c6ca4);
+    }
+
+    table {
       margin-top: 20px;
-      border-collapse: collapse;
     }
 
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      text-align: center;
+      vertical-align: middle !important;
     }
 
-    th {
-      background-color: #eee;
+    .table thead {
+      background-color: #f1f1f1;
+    }
+
+    .bi-trash-fill {
+      color: #e74c3c;
+      cursor: pointer;
+    }
+
+    .bi-trash-fill:hover {
+      color: #c0392b;
+    }
+
+    .section-divider {
+      border-top: 2px solid #e0e0e0;
+      margin: 40px 0;
     }
   </style>
 </head>
 <body>
+  
 
-  <h1>Bienvenue dans le système bancaire</h1>
+  <div class="container container-custom">
+    <h1 class="page-title">🏦 Système Bancaire - Accueil</h1>
 
-  <a href="view/client/accueil.html">Client</a>
-  <a href="agent.html">Agent</a>
-  <a href="admin.html">Admin</a>
+    <div class="nav-links text-center mb-4">
+      <a href="view/client/pres/liste_prets.html">Ajouter un pret</a>
+      <a href="agent.html">Agent</a>
+      <a href="admin.html">Admin</a>
+    </div>
 
-  <div class="admin-section">
-    <h2>Gestion des Types de Prêt (Admin)</h2>
-    <input type="text" id="nom_type" placeholder="Nom du prêt">
-    <input type="number" step="0.01" id="taux" placeholder="Taux (%)">
-    <button onclick="ajouterTypePret()">Ajouter</button>
+    <div class="admin-section">
+      <h3>🔧 Gestion des Types de Prêt (Admin)</h3>
+      <div class="row">
+        <div class="col-md-5">
+          <input type="text" id="nom_type" class="form-control" placeholder="Nom du prêt">
+        </div>
+        <div class="col-md-4">
+          <input type="number" step="0.01" id="taux" class="form-control" placeholder="Taux (%)">
+        </div>
+        <div class="col-md-3">
+          <button onclick="ajouterTypePret()" class="btn btn-custom w-100">Ajouter</button>
+        </div>
+      </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Taux (%)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="table-type-pret">
-      </tbody>
-    </table>
-  </div>
+      <table class="table table-bordered table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Taux (%)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="table-type-pret">
+        </tbody>
+      </table>
+    </div>
 
-  <table id="table-etudiants">
-    <thead>
-      <tr>
-        <th>ID</th><th>Nom</th><th>Prénom</th><th>Email</th><th>Âge</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+
 
   <script>
-    const apiBase = "http://localhost/projet_final/ws"; // adapte selon ton projet
+    const apiBase = "http://localhost/projet_final/ws";
 
     function chargerTypesPret() {
       fetch(apiBase + "/typepret")
@@ -262,7 +147,7 @@
               <td>${tp.id}</td>
               <td>${tp.nom}</td>
               <td>${tp.taux_interet}</td>
-              <td><button onclick="supprimerTypePret(${tp.id})">🗑️</button></td>
+              <td><i class="bi bi-trash-fill" onclick="supprimerTypePret(${tp.id})" title="Supprimer"></i></td>
             `;
             tbody.appendChild(row);
           });
@@ -273,44 +158,22 @@
       const nom = document.getElementById("nom_type").value;
       const taux = document.getElementById("taux").value;
 
-      const data = `nom=${encodeURIComponent(nom)}&taux_interet=${encodeURIComponent(taux)}`;
-
-      fetch(apiBase + "/connexion", {
+      fetch(apiBase + "/typepret", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(donnees)
+        body: JSON.stringify({ nom, taux_interet: taux })
       })
       .then(response => response.json())
       .then(data => {
-        if (data.succes && data.role === 'client') {
-          afficherMessage(`Bienvenue ${data.nom} !`, 'success');
-          
-          // Stocker les informations de session
-          sessionStorage.setItem('utilisateur', JSON.stringify({
-            id: data.id,
-            email: email,
-            nom: data.nom,
-            role: 'client',
-            profession: data.profession || '',
-            connecte: true,
-            derniere_connexion: new Date().toISOString()
-          }));
-
-          // Redirection vers l'interface client
-          setTimeout(() => {
-            window.location.href = 'view/client/accueil.html';
-          }, 1500);
-        } else if (data.succes && data.role !== 'client') {
-          afficherMessage('Accès refusé. Ce compte n\'est pas un compte client.', 'error');
+        if (data.success) {
+          chargerTypesPret();
+          document.getElementById("nom_type").value = "";
+          document.getElementById("taux").value = "";
         } else {
-          afficherMessage('Email ou mot de passe incorrect', 'error');
+          alert("Erreur lors de l'ajout.");
         }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        afficherMessage('Erreur de connexion. Vérifiez vos identifiants.', 'error');
       });
     }
 
@@ -323,7 +186,6 @@
       .then(() => chargerTypesPret());
     }
 
-    // Initialisation
     chargerTypesPret();
   </script>
 

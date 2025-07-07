@@ -45,8 +45,8 @@ INSERT INTO banque_fond (id, montant, id_type_fond, id_agent, date_ajout) VALUES
    Gammes / Types de prêts
    ------------------------------ */
 INSERT INTO banque_type_pret (id, nom, taux_interet, duree_mois) VALUES
-  (1, 'Prêt personnel', 4.50,  48),
-  (2, 'Prêt immobilier', 2.10, 240);
+  (3, 'Prêt personnel', 3.50,  240);
+
 
 /* ------------------------------
    Prêts

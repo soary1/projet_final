@@ -62,6 +62,8 @@ drop database if exists banque;
         taux_interet DECIMAL(5,2) NOT NULL CHECK (taux_interet >= 0),
         duree_mois INT NOT NULL
     );
+    ALTER TABLE banque_type_pret ADD COLUMN delai_defaut INT DEFAULT 0;
+
 
     CREATE TABLE banque_pret (
         id INT AUTO_INCREMENT PRIMARY KEY,

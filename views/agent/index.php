@@ -36,13 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($response !== false) {
             $data = json_decode($response, true);
             
-            if ($data['succes'] && $data['role'] === 'admin') {
+            if ($data['succes'] && $data['role'] === 'agent') {
                 // Création de la session
                 $_SESSION['utilisateur'] = [
                     'id' => $data['id'],
                     'email' => $email,
                     'nom' => $data['nom'],
-                    'role' => 'admin',
+                    'role' => 'agent',
                     'niveau_acces' => $data['niveau_acces'] ?? 'standard',
                     'connecte' => true,
                     'derniere_connexion' => date('Y-m-d H:i:s')
@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 header('Location: home.php');
                 exit();
-            } elseif ($data['succes'] && $data['role'] !== 'admin') {
-                $message = 'Accès refusé. Vous n\'avez pas les droits administrateur.';
+            } elseif ($data['succes'] && $data['role'] !== 'agent') {
+                $message = 'Accès refusé. Vous n\'avez pas les droits agent.';
                 $message_type = 'error';
             } else {
                 $message = 'Email ou mot de passe incorrect';
@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="login-container">
     <div class="login-header">
       <div class="bank-logo">🏦</div>
-      <h1>Connexion Administrateur</h1>
+      <h1>Connexion agent</h1>
       <div class="admin-badge">🔐 ACCÈS SÉCURISÉ</div>
-      <p>Interface d'administration bancaire</p>
+      <p>Interface d'agent dashboard bancaire</p>
     </div>
 
     <?php if (!empty($message)): ?>
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form id="loginForm" method="POST" action="">
       <div class="form-group">
-        <label for="email">Adresse email administrateur :</label>
+        <label for="email">Adresse email agent :</label>
         <input type="email" id="email" name="email" required placeholder="admin@banque.com" 
                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
       </div>
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
 
       <button type="submit" class="login-button">
-        🔓 Accéder à l'administration
+        🔓 Accéder à l'agent dashboard
       </button>
     </form>
 

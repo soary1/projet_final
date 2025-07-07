@@ -95,7 +95,7 @@ drop database if exists banque;
     -- Insertion des données par défaut
     -- Créer un utilisateur administrateur par défaut
     INSERT INTO banque_utilisateur (nom, email, mot_de_passe) VALUES 
-    ('Administrateur Principal', 'admin@banque.com', 'password123'),
+    -- ('Administrateur Principal', 'admin@banque.com', 'password123'),
     ('Jean Martin', 'agent@banque.com', 'agent123'),
     ('Marie Dubois', 'client@banque.com', 'client123');
     -- Mots de passe: admin123, agent123, client123

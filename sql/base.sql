@@ -1,4 +1,4 @@
-    drop database if exists banque;
+drop database if exists banque;
     -- Créer la base
     CREATE DATABASE IF NOT EXISTS banque CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
     USE banque;
@@ -26,6 +26,15 @@
         id_utilisateur INT,
         matricule VARCHAR(50) UNIQUE,
         date_embauche DATE,
+        FOREIGN KEY (id_utilisateur) REFERENCES banque_utilisateur(id) ON DELETE CASCADE
+    );
+
+    -- Table: admin
+    CREATE TABLE banque_admin (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        id_utilisateur INT,
+        niveau_acces VARCHAR(50) DEFAULT 'standard',
+        date_creation DATE DEFAULT (CURRENT_DATE),
         FOREIGN KEY (id_utilisateur) REFERENCES banque_utilisateur(id) ON DELETE CASCADE
     );
 
@@ -82,3 +91,42 @@
         date_modif DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (id_pret) REFERENCES banque_pret(id) ON DELETE CASCADE
     );
+
+    -- Insertion des données par défaut
+    -- Créer un utilisateur administrateur par défaut
+    INSERT INTO banque_utilisateur (nom, email, mot_de_passe) VALUES 
+    -- ('Administrateur Principal', 'admin@banque.com', 'password123'),
+    ('Jean Martin', 'agent@banque.com', 'agent123'),
+    ('Marie Dubois', 'client@banque.com', 'client123');
+    -- Mots de passe: admin123, agent123, client123
+
+    -- Créer le profil admin associé
+    INSERT INTO banque_admin (id_utilisateur, niveau_acces) VALUES 
+    (1, 'super-admin');
+
+    -- Créer un profil agent de test
+    INSERT INTO banque_agent (id_utilisateur, matricule, date_embauche) VALUES 
+    (2, 'AGT001', '2023-01-15');
+
+    -- Créer un profil client de test
+    INSERT INTO banque_client (id_utilisateur, profession, revenu_mensuel) VALUES 
+    (3, 'Ingénieur', 4500.00);
+
+    -- Ajouter quelques types de prêts par défaut
+    INSERT INTO banque_type_pret (nom, taux_interet, duree_mois) VALUES
+    ('Prêt immobilier', 3.50, 240),
+    ('Prêt automobile', 4.20, 84),
+    ('Prêt personnel', 6.80, 60),
+    ('Crédit travaux', 5.10, 120);
+
+    -- Ajouter des types de fonds
+    INSERT INTO banque_type_fond (nom) VALUES
+    ('Fonds de garantie'),
+    ('Réserves légales'),
+    ('Capital social');
+
+    -- Ajouter des rôles
+    INSERT INTO banque_role (nom) VALUES
+    ('Client'),
+    ('Agent'),
+    ('Administrateur');

@@ -884,16 +884,20 @@ function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
         ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
           const taux_annuel = parseFloat(typeData.taux_interet);
           const duree_mois = parseInt(typeData.duree_mois);
+          const assurance_taux = parseFloat(typeData.assurance || 0); // % assurance facultative
+const mensualite_assurance = montant * (assurance_taux / 100);
           const nom = typeData.nom;
           const taux_mensuel = taux_annuel / 100 / 12;
 
-          const mensualite_amortissable = (montant * taux_mensuel) /
-            (1 - Math.pow(1 + taux_mensuel, -duree_mois));
+          const mensualite_amortissable_base = (montant * taux_mensuel) /
+          (1 - Math.pow(1 + taux_mensuel, -duree_mois));
+          const mensualite_amortissable = mensualite_amortissable_base + mensualite_assurance;
           const total_amortissable = mensualite_amortissable * duree_mois;
 
+
           const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
-          const total_simple = montant + interet_simple_total;
-          const mensualite_simple = total_simple / duree_mois;
+const total_simple = montant + interet_simple_total + (mensualite_assurance * duree_mois);
+const mensualite_simple = total_simple / duree_mois;
 
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF();
@@ -931,10 +935,11 @@ function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
           const dateSansHeure = dateDemande.split(" ")[0];
           doc.text(`Date de Demande : ${dateSansHeure}`, 20, y); y += 7;
           doc.text(`Durée : ${duree_mois} mois`, 20, y); y += 7;
-          doc.text(`Taux Annuel : ${taux_annuel}%`, 20, y); y += 12;
+          doc.text(`Taux Annuel : ${taux_annuel}%`, 20, y); y += 7;
+          doc.text(`Taux Assurance : ${assurance_taux}%`, 20, y); y += 7;
 
           doc.setDrawColor(200);
-          doc.line(15, y, 195, y); y += 10;
+          doc.line(15, y, 195, y); y += 12;
 
           doc.setFont("helvetica", "bold");
           doc.setFontSize(13);
@@ -944,7 +949,7 @@ function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
           doc.setFont("helvetica", "normal");
           doc.setFontSize(12);
           doc.setTextColor(0, 0, 0);
-          doc.text(`Mensualité estimée : ${formatAr(mensualite_amortissable)} Ar`, 20, y); y += 7;
+          doc.text(`Mensualité (avec assurance) : ${formatAr(mensualite_amortissable)} Ar`, 20, y); y += 7;
           doc.text(`Total à rembourser : ${formatAr(total_amortissable)} Ar`, 20, y); y += 12;
 
           doc.setFont("helvetica", "bold");

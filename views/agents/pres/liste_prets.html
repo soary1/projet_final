@@ -2,193 +2,177 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Les Prêts</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>Prêts en attente - EF Mada</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    button { padding: 5px 10px; }
-    select { margin-bottom: 10px; padding: 5px; }
+    body {
+      display: flex;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f6fa;
+    }
+
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      background-color: #1e2a56;
+      padding: 30px 20px;
+      color: white;
+    }
+
+    .sidebar h2 {
+      color: #8fb1ff;
+      font-weight: bold;
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #2c3e70;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background-color: #f0f2f5;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    td {
+      padding: 12px;
+      text-align: center;
+      background-color: #fff;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .btn {
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 14px;
+    }
+
+    .btn-success {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Les Prêts</h1>
-  <a href="ajouter_pret.html">➕ Ajouter un prêt</a>
-
-  <div>
-    <label for="filtre-client">Filtrer par client :</label>
-    <select id="filtre-client" onchange="filtrerParClient()">
-      <option value="">-- Tous les clients --</option>
-    </select>
+  <div class="sidebar">
+    <h2>EF Mada</h2>
+    <a href="pres/liste_prets.html"><i class="bi bi-list"></i> Voir les prêts</a>
+    <a href="pres/prets-attente.html"><i class="bi bi-hourglass-split"></i> Voir les prêts en attente</a>
+    <a href="fond.php"><i class="bi bi-cash-stack"></i> Ajouter un fond</a>
+    <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
+    <a href="interet.php"><i class="bi bi-bar-chart"></i> Intérêt</a>
+    <a href="pres/liste_prets.html"><i class="bi bi-person-lines-fill"></i> Prêt Client</a>
   </div>
 
-  <table id="table-prets">
-    <thead>
-      <tr>
-        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="main-content">
+    <h1>Liste des prêts en attente</h1>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Email</th>
+            <th>Type de prêt</th>
+            <th>Montant</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-prets">
+          <!-- Données JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
 
   <script>
     const apiBase = "http://localhost/projet_final/ws";
 
-    function ajax(method, url, data, callback) {
-      const xhr = new XMLHttpRequest();
-      xhr.open(method, apiBase + url, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          callback(JSON.parse(xhr.responseText));
-        }
-      };
-      xhr.send(data);
-    }
-
-    function formatAr(n) {
-      return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    }
-
-    function chargerClients() {
-      ajax("GET", "/clients", null, (data) => {
-        const select = document.getElementById("filtre-client");
-        data.forEach(client => {
-          const option = document.createElement("option");
-          option.value = client.id;
-          option.textContent = client.nom_utilisateur;
-          select.appendChild(option);
+    function chargerPrets() {
+      fetch(apiBase + "/prets/en-attente")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("table-prets");
+          tbody.innerHTML = "";
+          data.forEach(p => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${p.nom_client}</td>
+              <td>${p.email}</td>
+              <td>${p.type_pret}</td>
+              <td>${p.montant} Ar</td>
+              <td>${new Date(p.date_demande).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-success" onclick="validerPret(${p.id})">Valider</button>
+                <button class="btn btn-danger" onclick="refuserPret(${p.id})">Refuser</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
         });
-      });
     }
 
-function chargerPrets(idClient = "") {
-  const url = idClient ? `/clients/${idClient}/prets` : "/prets";
-  ajax("GET", url, null, (data) => {
-    const tbody = document.querySelector("#table-prets tbody");
-    tbody.innerHTML = "";
-    data.forEach(p => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${p.id}</td>
-        <td>${p.id_client}</td>
-<td>${p.nom_type_pret}</td>
-        <td>${formatAr(p.montant)} Ar</td>
-        <td>${p.statut || 'en attente'}</td>
-        <td>${p.date_demande}</td>
-        <td><button onclick="exporterPDF(${p.id}, ${p.id_client}, '${p.id_type_pret}', ${p.montant}, '${p.date_demande}')">📄 PDF</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  });
-}
-
-
-
-    function filtrerParClient() {
-      const clientId = document.getElementById("filtre-client").value;
-      chargerPrets(clientId);
+    function validerPret(id) {
+      fetch(`${apiBase}/pret/valider/${id}`, { method: "POST" })
+        .then(res => res.json())
+        .then(() => chargerPrets());
     }
 
-    function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
-      ajax("GET", `/client/${clientId}`, null, (clientData) => {
-        const nomClient = clientData.nom_utilisateur;
-
-        ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
-          const taux_annuel = parseFloat(typeData.taux_interet);
-          const duree_mois = parseInt(typeData.duree_mois);
-          const nom = typeData.nom;
-          const taux_mensuel = taux_annuel / 100 / 12;
-
-          const mensualite_amortissable = (montant * taux_mensuel) /
-            (1 - Math.pow(1 + taux_mensuel, -duree_mois));
-          const total_amortissable = mensualite_amortissable * duree_mois;
-
-          const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
-          const total_simple = montant + interet_simple_total;
-          const mensualite_simple = total_simple / duree_mois;
-
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-
-          doc.setFillColor(44, 62, 80);
-          doc.rect(0, 0, 210, 25, 'F');
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(18);
-          doc.setFont("helvetica", "bold");
-          doc.text("BANQUE NATIONALE DE PRÊT", 15, 17);
-
-          doc.setFillColor(255, 255, 255);
-          doc.circle(190, 12, 6, 'F');
-          doc.setTextColor(44, 62, 80);
-          doc.setFontSize(8);
-          doc.text("BNP", 187, 14);
-
-          doc.setTextColor(0, 0, 0);
-          doc.setFontSize(16);
-          doc.setFont("helvetica", "bold");
-          doc.text("RELEVÉ DE PRÊT", 15, 35);
-          doc.setDrawColor(160);
-          doc.line(15, 38, 195, 38);
-
-          let y = 45;
-          doc.setFontSize(13);
-          doc.setFont("helvetica", "bold");
-          doc.text("Informations du Client", 15, y); y += 8;
-
-          doc.setFontSize(12);
-          doc.setFont("helvetica", "normal");
-          doc.text(`Nom du Client : ${nomClient}`, 20, y); y += 7;
-          doc.text(`Type de Prêt : ${nom}`, 20, y); y += 7;
-          doc.text(`Montant : ${formatAr(montant)} Ar`, 20, y); y += 7;
-          const dateSansHeure = dateDemande.split(" ")[0];
-          doc.text(`Date de Demande : ${dateSansHeure}`, 20, y); y += 7;
-          doc.text(`Durée : ${duree_mois} mois`, 20, y); y += 7;
-          doc.text(`Taux Annuel : ${taux_annuel}%`, 20, y); y += 12;
-
-          doc.setDrawColor(200);
-          doc.line(15, y, 195, y); y += 10;
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(13);
-          doc.setTextColor(0, 51, 102);
-          doc.text("Simulation - Intérêt Composé", 15, y); y += 8;
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`Mensualité estimée : ${formatAr(mensualite_amortissable)} Ar`, 20, y); y += 7;
-          doc.text(`Total à rembourser : ${formatAr(total_amortissable)} Ar`, 20, y); y += 12;
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(13);
-          doc.setTextColor(102, 0, 0);
-          doc.text("Simulation - Intérêt Simple", 15, y); y += 8;
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`Mensualité estimée : ${formatAr(mensualite_simple)} Ar`, 20, y); y += 7;
-          doc.text(`Total à rembourser : ${formatAr(total_simple)} Ar`, 20, y); y += 15;
-
-          doc.setDrawColor(180);
-          doc.line(15, y, 195, y); y += 10;
-
-          doc.setFontSize(10);
-          doc.setTextColor(120);
-          doc.text("Document confidentiel généré automatiquement – Ne pas divulguer", 15, 285);
-          doc.text("Page 1 / 1", 200, 285, { align: 'right' });
-
-          doc.save(`releve_pret_${id}.pdf`);
-        });
-      });
+    function refuserPret(id) {
+      fetch(`${apiBase}/pret/refuser/${id}`, { method: "POST" })
+        .then(res => res.json())
+        .then(() => chargerPrets());
     }
 
-    chargerClients();
     chargerPrets();
   </script>
+
 </body>
 </html>

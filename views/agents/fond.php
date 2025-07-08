@@ -425,6 +425,28 @@
       }
     }
 
+
+//     function chargerAgentDepuisSession() {
+//   fetch(apiBase + "/session_user")
+//     .then(res => {
+//       if (!res.ok) throw new Error("Non connecté");
+//       return res.json();
+//     })
+//     .then(data => {
+//       if (data.success && data.id_agent) {
+//         document.getElementById("id_agent").value = data.id_agent;
+//         console.log("ID agent chargé :", data.id_agent);
+//       } else {
+//         alert("Session invalide");
+//       }
+//     })
+//     .catch(err => {
+//       console.error("Erreur session :", err);
+//       alert("Veuillez vous reconnecter.");
+//       window.location.href = "/projet_final/views/agents/login.php";
+//     });
+// }
+
     function chargerTypesFond() {
       fetch(apiBase + "/typefond")
         .then(res => {

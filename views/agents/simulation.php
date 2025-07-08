@@ -600,7 +600,7 @@
           <div class="form-group">
             <label style="opacity: 0;">Action</label>
             <button type="submit" class="btn-success">
-              <i class="bi bi-check-circle"></i> Enregistrer les prêts
+              <i class="bi bi-check-circle"></i> Enregistrer simulation
             </button>
           </div>
         </div>
@@ -657,38 +657,41 @@
     </div>
   </div>
 
-<div class="card-modern" id="listeSimulations">
-    <div class="card-header">
-        <div class="icon">
-            <i class="bi bi-clock-history"></i>
-        </div>
-        <h3>Historique des simulations enregistrées</h3>
-    </div>
-    <div class="table-container">
-        <table class="table-modern">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Client</th>
-                    <th>Montant</th>
-                    <th>Taux</th>
-                    <th>Durée</th>
-                    <th>Mensualite</th>
-                    <th>Assurance</th>
-                    <th>Délai défaut</th>
-                    <th>Sélectionner</th>
-                </tr>
-            </thead>
-            <tbody id="historique-simulations">
-                <tr><td colspan="10">Chargement...</td></tr>
-            </tbody>
-        </table>
-        <!-- Le bouton doit être en dehors du tableau mais dans le conteneur de la carte -->
-        <button onclick="compareSimulations()" class="btn-primary" style="margin-top: 20px;">
-            Comparer les simulations sélectionnées
-        </button>
-    </div>
+<div style="display: flex; justify-content: center;">
+  <div class="card-modern" id="listeSimulations">
+      <div class="card-header">
+          <div class="icon">
+              <i class="bi bi-clock-history"></i>
+          </div>
+          <h3>Historique des simulations enregistrées</h3>
+      </div>
+      <div class="table-container">
+          <table class="table-modern">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>Client</th>
+                      <th>Montant</th>
+                      <th>Taux</th>
+                      <th>Durée</th>
+                      <th>Mensualité</th>
+                      <th>Assurance</th>
+                      <th>Délai défaut</th>
+                      <th>Sélectionner</th>
+                  </tr>
+              </thead>
+              <tbody id="historique-simulations">
+                  <tr><td colspan="10">Chargement...</td></tr>
+              </tbody>
+          </table>
+
+          <button onclick="compareSimulations()" class="btn-primary" style="margin-top: 20px;">
+              Comparer les simulations sélectionnées
+          </button>
+      </div>
+  </div>
 </div>
+
 
 
 
@@ -787,7 +790,7 @@ function afficherComparaison(simulations) {
     { label: "Durée", key: "duree_mois", lowerIsBetter: true },
     { label: "Mensualite", key: "mensualite", lowerIsBetter: true },
     { label: "Assurance", key: "assurance", lowerIsBetter: true },
-    { label: "Délai de défaut", key: "delai_defaut", lowerIsBetter: false }
+    // { label: "Délai de défaut", key: "delai_defaut", lowerIsBetter: false }
   ];
 
   const cartes = [[], []]; // stocke les lignes HTML de chaque carte

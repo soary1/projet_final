@@ -68,9 +68,6 @@ Flight::route('POST /admin/types-prets', [$adminController, 'createTypePret']);
 Flight::route('POST /admin/fonds', [$adminController, 'addFonds']);
 
 // Déconnexion
-Flight::route('GET /logout', [$authController, 'logout']);
-Flight::route('POST /logout', [$authController, 'logout']);
-
 
 
 

@@ -2,56 +2,457 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion Banque</title>
+  <title>Connexion - EF Mada</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      --dark-bg: #0f1419;
+      --card-bg: #1a1f2e;
+      --text-primary: #ffffff;
+      --text-secondary: #8b949e;
+      --border-color: #30363d;
+      --hover-bg: #21262d;
+      --error-color: #ff6b6b;
+      --success-color: #4facfe;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      max-width: 400px;
-      margin: auto;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
-    h1 {
-      text-align: center;
-    }
-    input, button {
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+      z-index: -1;
     }
-    .message {
-      padding: 10px;
-      margin-top: 15px;
+
+    .login-container {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+    }
+
+    .login-header {
       text-align: center;
-      display: none;
-      border-radius: 5px;
+      margin-bottom: 2.5rem;
+    }
+
+    .login-header .logo {
+      width: 80px;
+      height: 80px;
+      background: var(--primary-gradient);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      color: white;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .login-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      transition: color 0.3s ease;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--hover-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1rem 1rem 3rem;
+      color: var(--text-primary);
+      font-size: 1rem;
       transition: all 0.3s ease;
+      outline: none;
     }
-    .erreur {
-      background: #ffdddd;
-      color: #900;
-      border: 1px solid red;
-      font-weight: bold;
+
+    .form-control::placeholder {
+      color: var(--text-secondary);
     }
-    .ok {
-      background: #ddffdd;
-      color: #090;
-      border: 1px solid green;
+
+    .form-control:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control:focus + .input-wrapper i {
+      color: #667eea;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: color 0.3s ease;
+      z-index: 10;
+    }
+
+    .password-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--primary-gradient);
+      border: none;
+      color: white;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-login:hover::before {
+      left: 100%;
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .loading-spinner {
+      display: none;
+      margin-right: 0.5rem;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .message {
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.error {
+      background: rgba(255, 107, 107, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .message.success {
+      background: rgba(79, 172, 254, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(79, 172, 254, 0.3);
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .forgot-password a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+      color: #667eea;
+    }
+
+    .demo-credentials {
+      background: var(--hover-bg);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .demo-credentials h3 {
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .demo-credentials p {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin: 0.25rem 0;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 2rem;
+        margin: 1rem;
+      }
+      
+      .login-header .logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+      
+      .login-header h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo">
+        <i class="bi bi-graph-up"></i>
+      </div>
+      <h1>EF Mada</h1>
+      <p>Connectez-vous à votre espace de gestion</p>
+    </div>
 
-  <h1>Connexion</h1>
+    <div class="demo-credentials">
+      <h3><i class="bi bi-info-circle"></i> Identifiants de démonstration</h3>
+      <p><strong>Email:</strong> claire.bernard@example.com</p>
+      <p><strong>Mot de passe:</strong> client123</p>
+    </div>
 
-  <input type="email" id="email" placeholder="Email" value="claire.bernard@example.com" required>
-  <input type="password" id="mot_de_passe" placeholder="Mot de passe" value="client123" required>
+    <div id="resultat" class="message"></div>
 
-  <button onclick="connexion()">Se connecter</button>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Adresse email</label>
+        <div class="input-wrapper">
+          <i class="bi bi-envelope"></i>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-control" 
+            placeholder="votre@email.com"
+            value="claire.bernard@example.com"
+            required
+          >
+        </div>
+      </div>
 
-  <div id="resultat" class="message"></div>
+      <div class="form-group">
+        <label for="mot_de_passe">Mot de passe</label>
+        <div class="input-wrapper">
+          <i class="bi bi-lock"></i>
+          <input 
+            type="password" 
+            id="mot_de_passe" 
+            class="form-control" 
+            placeholder="Votre mot de passe"
+            value="client123"
+            required
+          >
+          <button type="button" class="password-toggle" onclick="togglePassword()">
+            <i class="bi bi-eye" id="password-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span class="loading-spinner" id="loading">
+          <div class="spinner"></div>
+        </span>
+        <i class="bi bi-box-arrow-in-right"></i>
+        Se connecter
+      </button>
+    </form>
+
+    <div class="forgot-password">
+      <a href="#" onclick="showForgotPassword()">Mot de passe oublié ?</a>
+    </div>
+  </div>
 
   <script>
-    const api = "http://localhost/projet_final/ws"; // Adapter si besoin
+    const api = "http://localhost/projet_final/ws";
+
+    function togglePassword() {
+      const passwordInput = document.getElementById('mot_de_passe');
+      const passwordIcon = document.getElementById('password-icon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordIcon.className = 'bi bi-eye-slash';
+      } else {
+        passwordInput.type = 'password';
+        passwordIcon.className = 'bi bi-eye';
+      }
+    }
+
+    function showLoading() {
+      const loginBtn = document.getElementById('loginBtn');
+      const loading = document.getElementById('loading');
+      
+      loginBtn.disabled = true;
+      loading.style.display = 'inline-block';
+      loginBtn.innerHTML = '<span class="loading-spinner" style="display: inline-block;"><div class="spinner"></div></span> Connexion en cours...';
+    }
+
+    function hideLoading() {
+      const loginBtn = document.getElementById('loginBtn');
+      const loading = document.getElementById('loading');
+      
+      loginBtn.disabled = false;
+      loading.style.display = 'none';
+      loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Se connecter';
+    }
+
+    function afficher(message, erreur = false) {
+      const box = document.getElementById("resultat");
+      box.style.display = "block";
+      box.className = "message " + (erreur ? "error" : "success");
+      box.innerHTML = `<i class="bi ${erreur ? 'bi-exclamation-triangle' : 'bi-check-circle'}"></i> ${message}`;
+      
+      // Auto-hide success messages after 3 seconds
+      if (!erreur) {
+        setTimeout(() => {
+          box.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    function showForgotPassword() {
+      afficher("Fonctionnalité de récupération de mot de passe en cours de développement.", false);
+    }
 
     function connexion() {
       const email = document.getElementById("email").value.trim();
@@ -61,6 +462,15 @@
         afficher("Veuillez remplir tous les champs.", true);
         return;
       }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        afficher("Format d'email invalide.", true);
+        return;
+      }
+
+      showLoading();
 
       fetch(`${api}/connexion`, {
         method: "POST",
@@ -75,35 +485,57 @@
           return;
         }
 
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "gestion-session.php";
+        afficher("Connexion réussie ! Redirection en cours...", false);
+        
+        // Simulate redirect after success message
+        setTimeout(() => {
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = "gestion-session.php";
 
-        for (const key in data) {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = data[key];
-          form.appendChild(input);
-        }
+          for (const key in data) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = data[key];
+            form.appendChild(input);
+          }
 
-        document.body.appendChild(form);
-        form.submit();
+          document.body.appendChild(form);
+          form.submit();
+        }, 1000);
 
       })
       .catch(err => {
         console.error("Erreur JS/fetch :", err);
         afficher("⚠️ Erreur technique ou serveur injoignable", true);
+      })
+      .finally(() => {
+        hideLoading();
       });
     }
 
-    function afficher(message, erreur = false) {
-      const box = document.getElementById("resultat");
-      box.style.display = "block";
-      box.className = "message " + (erreur ? "erreur" : "ok");
-      box.textContent = message;
-    }
-  </script>
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      connexion();
+    });
 
+    // Handle Enter key press
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        connexion();
+      }
+    });
+
+    // Add floating animation to the logo
+    const logo = document.querySelector('.logo');
+    setInterval(() => {
+      logo.style.transform = 'translateY(-5px)';
+      setTimeout(() => {
+        logo.style.transform = 'translateY(0)';
+      }, 1000);
+    }, 3000);
+  </script>
 </body>
 </html>

@@ -218,7 +218,7 @@
      */
     public function logout() {
         session_destroy();
-        Flight::redirect('/projet_final/ws/login');
+        Flight::redirect('/');
     }
     
     /**

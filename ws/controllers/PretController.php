@@ -33,7 +33,7 @@ class PretController {
     
 public static function getAllPrets(): void
 {
-    Flight::json(Pret::allWithTypePret()); // ✅ OK : contient nom_type_pret et taux_interet
+    Flight::json(Pret::allWithTypePret()); 
 }
 
   

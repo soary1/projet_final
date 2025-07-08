@@ -429,11 +429,12 @@
       <h2><i class="bi bi-graph-up"></i> EF Mada</h2>
     </div>
     <nav class="sidebar-nav">
-      <a href="#"><i class="bi bi-house-door"></i> Dashboard</a>
-      <a href="#"><i class="bi bi-person"></i> Clients</a>
-      <a href="#" class="active"><i class="bi bi-bar-chart"></i> Intérêts</a>
-      <a href="#"><i class="bi bi-calculator"></i> Simulation</a>
-      <a href="#"><i class="bi bi-gear"></i> Paramètres</a>
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts</a>
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Remboursement</a>
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Export Pdf</a>
+      <a href="pres/prets-attente.html"><i class="bi bi-clock-history"></i> Prêts en attente</a>
+      <a href="interet.php" class="active"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
     </nav>
   </div>
 
@@ -746,104 +747,6 @@
             }
         });
         }
-
-
-    // function afficherGraphique(donnees) {
-    //   const tbody = document.getElementById("resultatTableBody");
-    //   const graphiqueCard = document.getElementById("graphiqueCard");
-    //   const tableauCard = document.getElementById("tableauCard");
-    //   const emptyState = document.getElementById("empty-state");
-      
-    //   tbody.innerHTML = "";
-      
-    //   if (donnees.length === 0) {
-    //     emptyState.style.display = "block";
-    //     graphiqueCard.classList.add("hidden");
-    //     tableauCard.classList.add("hidden");
-    //     return;
-    //   }
-
-    //   emptyState.style.display = "none";
-    //   graphiqueCard.classList.remove("hidden");
-    //   tableauCard.classList.remove("hidden");
-
-    //   const labels = [], prevus = [], reels = [];
-
-    //   donnees.forEach(ligne => {
-    //     labels.push(ligne.mois);
-    //     prevus.push(parseFloat(ligne.interet_prevu));
-    //     reels.push(parseFloat(ligne.interet_reel));
-
-    //     const tr = document.createElement("tr");
-    //     tr.innerHTML = `
-    //       <td><strong>${ligne.mois}</strong></td>
-    //       <td><span class="amount-badge amount-prevu">${parseFloat(ligne.interet_prevu).toLocaleString()} Ar</span></td>
-    //       <td><span class="amount-badge amount-reel">${parseFloat(ligne.interet_reel).toLocaleString()} Ar</span></td>
-    //       <td><span class="stats-badge">${ligne.nb_remboursements}</span></td>
-    //       <td><span class="stats-badge ${ligne.nb_retards > 0 ? 'retard-badge' : ''}">${ligne.nb_retards}</span></td>
-    //     `;
-    //     tbody.appendChild(tr);
-    //   });
-
-    //   const ctx = document.getElementById("graphique").getContext("2d");
-    //   if (chart) chart.destroy();
-
-    //   chart = new Chart(ctx, {
-    //     type: "bar",
-    //     data: {
-    //       labels: labels,
-    //       datasets: [
-    //         {
-    //           label: "Intérêt Prévu",
-    //           data: prevus,
-    //           backgroundColor: "rgba(79, 172, 254, 0.8)",
-    //           borderColor: "#4facfe",
-    //           borderWidth: 1
-    //         },
-    //         {
-    //           label: "Intérêt Réel",
-    //           data: reels,
-    //           backgroundColor: "rgba(39, 174, 96, 0.8)",
-    //           borderColor: "#27ae60",
-    //           borderWidth: 1
-    //         }
-    //       ]
-    //     },
-    //     options: {
-    //       responsive: true,
-    //       maintainAspectRatio: false,
-    //       plugins: {
-    //         legend: {
-    //           labels: {
-    //             color: '#ffffff'
-    //           }
-    //         }
-    //       },
-    //       scales: {
-    //         x: {
-    //           ticks: {
-    //             color: '#8b949e'
-    //           },
-    //           grid: {
-    //             color: '#30363d'
-    //           }
-    //         },
-    //         y: {
-    //           beginAtZero: true,
-    //           ticks: {
-    //             color: '#8b949e',
-    //             callback: function(value) {
-    //               return value.toLocaleString() + ' Ar';
-    //             }
-    //           },
-    //           grid: {
-    //             color: '#30363d'
-    //           }
-    //         }
-    //       }
-    //     }
-    //   });
-    // }
 
     window.onload = () => {
       remplirSelects();

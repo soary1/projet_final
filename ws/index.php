@@ -17,6 +17,7 @@ require 'routes/utilisateur_routes.php';
 require 'routes/remboursement_routes.php';
 require 'routes/disponibilite_route.php';
 
+require 'routes/simulation_routes.php';
 
 
 Flight::start();

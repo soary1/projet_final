@@ -561,7 +561,7 @@
       <a href="../simulation.php"><i class="bi bi-calculator"></i> Simulation</a>
       <a href="../pres/liste_prets.html" class="active"><i class="bi bi-list-check"></i> Prêts</a>
       <a href="../pres/prets-attente.html"><i class="bi bi-hourglass-split"></i> Prêts en attente</a>
-      <a href="#"><i class="bi bi-gear"></i> Paramètres</a>
+      <!-- <a href="#"><i class="bi bi-gear"></i> Paramètres</a> -->
     </nav>
   </div>
 
@@ -885,7 +885,7 @@ function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
           const taux_annuel = parseFloat(typeData.taux_interet);
           const duree_mois = parseInt(typeData.duree_mois);
           const assurance_taux = parseFloat(typeData.assurance || 0); // % assurance facultative
-const mensualite_assurance = montant * (assurance_taux / 100);
+          const mensualite_assurance = montant * (assurance_taux / 100);
           const nom = typeData.nom;
           const taux_mensuel = taux_annuel / 100 / 12;
 

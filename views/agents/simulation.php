@@ -443,11 +443,11 @@
       <h2><i class="bi bi-graph-up"></i> EF Mada</h2>
     </div>
     <nav class="sidebar-nav">
-      <a href="#"><i class="bi bi-house-door"></i> Dashboard</a>
-      <a href="#"><i class="bi bi-person"></i> Clients</a>
-      <a href="#"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts a rembourser</a>
+      <a href="pres/prets-attente.html"><i class="bi bi-clock-history"></i> Prêts en attente</a>
+      <a href="interet.php" class="bi bi-calculator"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="interets_par_mois.php" class="bi bi-calculator"><i class="bi bi-bar-chart"></i> Intérêts Gagné Par mois</a>
       <a href="#" class="active"><i class="bi bi-calculator"></i> Simulation</a>
-      <a href="#"><i class="bi bi-gear"></i> Paramètres</a>
     </nav>
   </div>
 

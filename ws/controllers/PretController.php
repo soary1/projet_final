@@ -55,8 +55,8 @@ public static function getAllPrets(): void
 
 
     public static function ajouterType() {
-        $data = json_decode(file_get_contents("php://input"), true);
-
+        $data  = Flight::request()->data;
+        
         if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'], $data['assurance'])) {
             Flight::json(['success' => false, 'message' => 'Paramètres manquants.'], 400);
             return;

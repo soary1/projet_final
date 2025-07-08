@@ -30,13 +30,14 @@ class TypePretController
         $taux         = $d['taux_interet'] ?? null;
         $duree        = $d['duree_mois'] ?? null;
         $delai_defaut = $d['delai_defaut'] ?? 0;
+        $assurance    = $d['assurance'] ?? 0;
 
         if (!$nom || !$taux || !$duree) {
             Flight::json(['error' => 'Champs requis manquants'], 400);
             return;
         }
 
-        $id = TypePret::create($nom, (float)$taux, (int)$duree, (int)$delai_defaut);
+        $id = TypePret::create($nom, (float)$taux, (int)$duree, (int)$delai_defaut, $assurance);
         Flight::json(['message' => 'Type de prêt ajouté', 'id' => $id], 200);
     }
 }

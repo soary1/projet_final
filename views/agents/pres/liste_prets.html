@@ -660,13 +660,10 @@
     </div>
   </div>
 
-  <!-- Modal Remboursement -->
-  <div class="modal-overlay" id="modal-remboursement">
+   <div class="modal-overlay" id="modal-remboursement">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="icon">
-          <i class="bi bi-cash"></i>
-        </div>
+        <div class="icon"><i class="bi bi-cash"></i></div>
         <h3>Ajouter un Remboursement</h3>
       </div>
       <div class="form-group">
@@ -686,12 +683,10 @@
   </div>
 
   <!-- Modal N Mois -->
-  <div class="modal-overlay" id="modal-nmois">
+    <div class="modal-overlay" id="modal-nmois">
     <div class="modal-content">
       <div class="modal-header">
-        <div class="icon">
-          <i class="bi bi-calendar2-range"></i>
-        </div>
+        <div class="icon"><i class="bi bi-calendar2-range"></i></div>
         <h3>Rembourser N Mois</h3>
       </div>
       <div class="form-group">
@@ -835,12 +830,10 @@
     function chargerClients() {
       ajax("GET", "/clients", null, (data) => {
         const select = document.getElementById("filtre-client");
-        select.innerHTML = '<option value="">Tous les clients</option>';
-        
         data.forEach(client => {
           const option = document.createElement("option");
           option.value = client.id;
-          option.textContent = client.nom_utilisateur || client.nom;
+          option.textContent = client.nom_utilisateur;
           select.appendChild(option);
         });
       });
@@ -858,34 +851,141 @@
       chargerPrets(clientId, statut);
     }
 
-function ouvrirFormRemboursement(idPret) {
-  document.getElementById('remb-id-pret').value = idPret;
-  document.getElementById('remb-date-paiement').value = '';
-  document.getElementById('form-remboursement').style.display = 'block';
-}
-
-function fermerForm() {
-  document.getElementById('form-remboursement').style.display = 'none';
-}
-function validerRemboursement() {
-  const idPret = document.getElementById('remb-id-pret').value;
-  const datePaiement = document.getElementById('remb-date-paiement').value;
-
-  if (!datePaiement) {
-    alert("Veuillez saisir la date de paiement.");
-    return;
+  function ouvrirFormRemboursement(idPret) {
+    document.getElementById('remb-id-pret').value = idPret;
+    document.getElementById('remb-date-paiement').value = '';
+    document.getElementById('modal-remboursement').style.display = 'flex';
   }
 
-  const params = `id_pret=${idPret}&date_paiement=${datePaiement}`;
-  ajax("POST", "/remboursements", params, (res) => {
-    if (res.success) {
-      alert(res.message); // succès
-      fermerForm();
-    } else {
-      alert("❌ " + res.message); // message d'erreur serveur
-    }
-  });
+    function formatAr(n) {
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') ;
 }
+function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
+      ajax("GET", `/client/${clientId}`, null, (clientData) => {
+        const nomClient = clientData.nom_utilisateur;
+
+        ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
+          const taux_annuel = parseFloat(typeData.taux_interet);
+          const duree_mois = parseInt(typeData.duree_mois);
+          const nom = typeData.nom;
+          const taux_mensuel = taux_annuel / 100 / 12;
+
+          const mensualite_amortissable = (montant * taux_mensuel) /
+            (1 - Math.pow(1 + taux_mensuel, -duree_mois));
+          const total_amortissable = mensualite_amortissable * duree_mois;
+
+          const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
+          const total_simple = montant + interet_simple_total;
+          const mensualite_simple = total_simple / duree_mois;
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          doc.setFillColor(44, 62, 80);
+          doc.rect(0, 0, 210, 25, 'F');
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(18);
+          doc.setFont("helvetica", "bold");
+          doc.text("BANQUE NATIONALE DE PRÊT", 15, 17);
+
+          doc.setFillColor(255, 255, 255);
+          doc.circle(190, 12, 6, 'F');
+          doc.setTextColor(44, 62, 80);
+          doc.setFontSize(8);
+          doc.text("EF Mada", 187, 14);
+
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(16);
+          doc.setFont("helvetica", "bold");
+          doc.text("RELEVÉ DE PRÊT", 15, 35);
+          doc.setDrawColor(160);
+          doc.line(15, 38, 195, 38);
+
+          let y = 45;
+          doc.setFontSize(13);
+          doc.setFont("helvetica", "bold");
+          doc.text("Informations du Client", 15, y); y += 8;
+
+          doc.setFontSize(12);
+          doc.setFont("helvetica", "normal");
+          doc.text(`Nom du Client : ${nomClient}`, 20, y); y += 7;
+          doc.text(`Type de Prêt : ${nom}`, 20, y); y += 7;
+          doc.text(`Montant : ${formatAr(montant)} Ar`, 20, y); y += 7;
+          const dateSansHeure = dateDemande.split(" ")[0];
+          doc.text(`Date de Demande : ${dateSansHeure}`, 20, y); y += 7;
+          doc.text(`Durée : ${duree_mois} mois`, 20, y); y += 7;
+          doc.text(`Taux Annuel : ${taux_annuel}%`, 20, y); y += 12;
+
+          doc.setDrawColor(200);
+          doc.line(15, y, 195, y); y += 10;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.setTextColor(0, 51, 102);
+          doc.text("Simulation - Intérêt Composé", 15, y); y += 8;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`Mensualité estimée : ${formatAr(mensualite_amortissable)} Ar`, 20, y); y += 7;
+          doc.text(`Total à rembourser : ${formatAr(total_amortissable)} Ar`, 20, y); y += 12;
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.setTextColor(102, 0, 0);
+          doc.text("Simulation - Intérêt Simple", 15, y); y += 8;
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          doc.text(`Mensualité estimée : ${formatAr(mensualite_simple)} Ar`, 20, y); y += 7;
+          doc.text(`Total à rembourser : ${formatAr(total_simple)} Ar`, 20, y); y += 15;
+
+          doc.setDrawColor(180);
+          doc.line(15, y, 195, y); y += 10;
+
+          doc.setFontSize(10);
+          doc.setTextColor(120);
+          doc.text("Document confidentiel généré automatiquement – Ne pas divulguer", 15, 285);
+          doc.text("Page 1 / 1", 200, 285, { align: 'right' });
+
+          doc.save(`releve_pret_${id}.pdf`);
+        });
+      });
+    }
+
+      function fermerModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+function fermerForm() {
+document.getElementById('form-remboursement').style.display = 'none';
+}
+  function validerRemboursement() {
+    const idPret = document.getElementById('remb-id-pret').value;
+    const datePaiement = document.getElementById('remb-date-paiement').value;
+
+    if (!datePaiement) {
+      alert("Veuillez saisir la date de paiement.");
+      return;
+    }
+
+    const params = `id_pret=${idPret}&date_paiement=${datePaiement}`;
+    ajax("POST", "/remboursements", params, (res) => {
+      if (res.success) {
+        alert(res.message);
+        fermerModal('modal-remboursement');
+      } else {
+        alert("❌ " + res.message);
+      }
+    });
+  }
+
+  // function ouvrirFormNmois(idPret) {
+  //   document.getElementById('nmois-id-pret').value = idPret;
+  //   document.getElementById('nmois-nb').value = '';
+  //   document.getElementById('modal-nmois').style.display = 'flex';
+  // }
 function rembourserTout(idPret) {
   if (!confirm("Générer toutes les mensualités de ce prêt ?")) return;
 
@@ -898,34 +998,30 @@ function rembourserTout(idPret) {
   });
 }
 
-function ouvrirFormNmois(idPret) {
-  document.getElementById('nmois-id-pret').value = idPret;
-  document.getElementById('nmois-nb').value = '';
-  document.getElementById('form-nmois').style.display = 'block';
-}
-
-function validerRemboursementNmois() {
-  const idPret = document.getElementById('nmois-id-pret').value;
-  const nb = document.getElementById('nmois-nb').value;
-
-  if (!nb || nb <= 0) {
-    alert("❗ Veuillez entrer un nombre de mois valide.");
-    return;
-  }
-
-  const params = `nb=${nb}`;
-  ajax("POST", `/remboursements/nmois/${idPret}`, params, (res) => {
-    if (res.success) {
-      alert("✅ " + res.message);
-      document.getElementById('form-nmois').style.display = 'none';
-    } else {
-      alert("❌ " + (res.message || "Erreur pendant le remboursement partiel"));
+ function ouvrirFormNmois(idPret) {
+      document.getElementById('nmois-id-pret').value = idPret;
+      document.getElementById('nmois-nb').value = '';
+      document.getElementById('modal-nmois').style.display = 'flex';
     }
-  });
-}
+
+    function validerRemboursementNmois() {
+      const idPret = document.getElementById('nmois-id-pret').value;
+      const nb = document.getElementById('nmois-nb').value;
+      if (!nb || nb <= 0) return alert("❗ Veuillez entrer un nombre de mois valide.");
+      const params = `nb=${nb}`;
+      ajax("POST", `/remboursements/nmois/${idPret}`, params, (res) => {
+        if (res.success) {
+          alert("✅ " + res.message);
+          fermerModal('modal-nmois');
+        } else {
+          alert("❌ " + (res.message || "Erreur pendant le remboursement partiel"));
+        }
+      });
+    }
 
 
 
+    chargerClients();
 
     chargerPrets();
   </script>

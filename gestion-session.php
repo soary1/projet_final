@@ -20,10 +20,7 @@ switch ($_SESSION['user']['role']) {
     header('Location: views/admin/accueil.php');
     break;
   case 'agent':
-    header('Location: views/agents/accueil.html');
-    break;
-  case 'client':
-    header('Location: views/client/accueil.html');
+    header('Location: views/agents/interet.php');
     break;
   default:
     header('Location: login.php?erreur=Rôle inconnu');

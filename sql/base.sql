@@ -145,18 +145,18 @@ CREATE TABLE banque_remboursement (
     FOREIGN KEY (id_pret) REFERENCES banque_pret(id) ON DELETE CASCADE
 );
 
--- CREATE TABLE banque_simulation (
---     id SERIAL PRIMARY KEY,
---     id_client INT NOT NULL,
---     id_agent INT NOT NULL,
---     montant NUMERIC(15, 2) NOT NULL,
---     taux_annuel NUMERIC(5, 2) NOT NULL,
---     duree_mois INT NOT NULL,
---     assurance NUMERIC(5,2) DEFAULT 0,
---     mensualite NUMERIC(15, 2),
---     interet_total NUMERIC(15, 2),
---     interet_mensuel NUMERIC(15, 2),
---     date_simulation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     CONSTRAINT fk_simulation_client FOREIGN KEY (id_client) REFERENCES banque_client(id) ON DELETE CASCADE,
---     CONSTRAINT fk_simulation_agent FOREIGN KEY (id_agent) REFERENCES banque_agent(id) ON DELETE SET NULL
--- );
+CREATE TABLE banque_simulation (
+    id SERIAL PRIMARY KEY,
+    id_client INT NOT NULL,
+    id_agent INT ,
+    montant NUMERIC(15, 2) NOT NULL,
+    taux_annuel NUMERIC(5, 2) NOT NULL,
+    duree_mois INT NOT NULL,
+    assurance NUMERIC(5,2) DEFAULT 0,
+    mensualite NUMERIC(15, 2),
+    interet_total NUMERIC(15, 2),
+    interet_mensuel NUMERIC(15, 2),
+    date_simulation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_simulation_client FOREIGN KEY (id_client) REFERENCES banque_client(id) ON DELETE CASCADE,
+    CONSTRAINT fk_simulation_agent FOREIGN KEY (id_agent) REFERENCES banque_agent(id) ON DELETE SET NULL
+);

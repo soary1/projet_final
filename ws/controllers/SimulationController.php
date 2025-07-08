@@ -64,7 +64,6 @@ public static function simulerPret() {
             $typePret = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$typePret) {
-                // Créer automatiquement le type de prêt avec nom auto-généré
                 $nom = "Auto {$taux}% / {$duree} mois / {$assurance}%";
                 $stmt = $db->prepare("
                     INSERT INTO banque_type_pret (nom, taux_interet, duree_mois, assurance)
@@ -109,14 +108,36 @@ public static function simulerPret() {
                 $interet_mensuel
             ]);
 
+            // 4. Insertion dans banque_pret (statut par défaut = 'en attente')
+            $stmt = $db->prepare("
+    INSERT INTO banque_pret 
+    (id_client, id_agent, id_type_pret, montant, statut)
+    VALUES (?, ?, ?, ?, 'valide')
+");
+$stmt->execute([
+    $data['id_client'],
+    $data['id_agent'],
+    $id_type_pret,
+    $montant
+]);
+
+
             $success[] = true;
         }
 
-        Flight::json(['success' => true, 'message' => 'Simulation(s) enregistrée(s) et type(s) de prêt créés si nécessaire']);
+        Flight::json([
+            'success' => true,
+            'message' => 'Simulation(s) et prêt(s) enregistrés avec succès.'
+        ]);
+
     } catch (Exception $e) {
-        Flight::json(['success' => false, 'message' => 'Erreur serveur : ' . $e->getMessage()]);
+        Flight::json([
+            'success' => false,
+            'message' => 'Erreur serveur : ' . $e->getMessage()
+        ], 500);
     }
 }
+
 public static function afficherComparaison() {
     // Vérification si le paramètre 'ids' est passé dans l'URL
     if (!isset($_GET['ids']) || empty($_GET['ids'])) {

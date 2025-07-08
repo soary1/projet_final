@@ -928,7 +928,7 @@ simulations.push({ montant, taux, duree, assurance, delai });      afficherResul
       
       // Reset form
       document.getElementById("simulationForm").reset();
-      showNotification('Simulation ajoutée avec succès');
+      showNotification('Simulation ajoutée avec succès veuillez actualiser la page pour voir les résultats', 'success');
     });
 
     function afficherResultats() {

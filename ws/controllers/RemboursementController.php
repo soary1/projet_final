@@ -146,5 +146,27 @@ public function rembourserNmois($idPret) {
     }
 }
 
+    public static function interetsReels() {
+        // Lecture des paramètres GET
+        $moisDebut = Flight::request()->query['mois_debut'];
+        $anneeDebut = Flight::request()->query['annee_debut'];
+        $moisFin = Flight::request()->query['mois_fin'];
+        $anneeFin = Flight::request()->query['annee_fin'];
+
+        if (!$moisDebut || !$anneeDebut || !$moisFin || !$anneeFin) {
+            Flight::json(['success' => false, 'message' => 'Période invalide.'], 400);
+            return;
+        }
+
+        // Construction des dates au format Y-m-d
+        $dateDebut = sprintf('%04d-%02d-01', $anneeDebut, $moisDebut);
+        $dateFin = date("Y-m-t", strtotime(sprintf('%04d-%02d-01', $anneeFin, $moisFin))); // dernier jour du mois
+
+        // Récupération depuis le modèle
+        $resultats = Remboursement::getInteretsParMois($dateDebut, $dateFin);
+
+        Flight::json(['success' => true, 'data' => $resultats]);
+    }
+
 
 }

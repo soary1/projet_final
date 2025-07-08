@@ -84,6 +84,22 @@ public static function byClient(int $idClient): array {
         return $db->lastInsertId();
     }
 
+    public static function getMontantEmprunteAvant(string $mois): float {
+        $pdo = getDB();
+
+        $stmt = $pdo->prepare("SELECT SUM(montant) as total FROM banque_pret WHERE statut = 'valide' AND DATE_FORMAT(date_demande, '%Y-%m') <= ?");
+        $stmt->execute([$mois]);
+        return floatval($stmt->fetch()['total'] ?? 0);
+    }
+
+    public static function getRemboursementsAvant(string $mois): float {
+        $pdo = getDB();
+        $stmt = $pdo->prepare("SELECT SUM(montant) as total FROM banque_remboursement WHERE DATE_FORMAT(date_paiement, '%Y-%m') <= ?");
+        $stmt->execute([$mois]);
+        return floatval($stmt->fetch()['total'] ?? 0);
+    }
+
+
     public static function delete(int $id): void {
         $st = getDB()->prepare("DELETE FROM banque_pret WHERE id = ?");
         $st->execute([$id]);
@@ -126,7 +142,4 @@ public static function byClient(int $idClient): array {
         $stmt = $db->prepare("INSERT INTO banque_type_pret (nom, taux_interet, duree_mois, assurance) VALUES (?, ?, ?, ?)");
         return $stmt->execute([$nom, $taux, $duree, $assurance]);
     }
-
-
-
 }

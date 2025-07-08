@@ -211,4 +211,51 @@ public static function rembourserTout(int $idPret): bool {
             WHERE r.date_paiement > r.date_echeance
         ")->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public static function getInteretsParMois($dateDebut, $dateFin) {
+        $db = getDB();
+
+        $stmt = $db->prepare("
+            SELECT
+                DATE_FORMAT(r.date_paiement, '%Y-%m') AS mois_paiement,
+                SUM( (p.montant * t.taux_interet / 100) / t.duree_mois ) AS interet_mensuel_gagne,
+                COUNT(*) AS nb_remboursements,
+                SUM(CASE WHEN r.date_paiement > r.date_echeance THEN 1 ELSE 0 END) AS nb_retards
+            FROM banque_remboursement r
+            JOIN banque_pret p ON r.id_pret = p.id
+            JOIN banque_type_pret t ON p.id_type_pret = t.id
+            WHERE r.date_paiement BETWEEN ? AND ?
+            GROUP BY mois_paiement
+            ORDER BY mois_paiement ASC
+        ");
+        $stmt->execute([$dateDebut, $dateFin]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getInteretsPrevusEtReels($dateDebut, $dateFin) {
+        $db = getDB();
+
+        $stmt = $db->prepare("
+            SELECT 
+                DATE_FORMAT(r.date_paiement, '%Y-%m') AS mois,
+                SUM( (p.montant * t.taux_interet / 100) / t.duree_mois ) AS interet_reel,
+                COUNT(*) AS nb_remboursements,
+                SUM(CASE WHEN r.date_paiement > r.date_echeance THEN 1 ELSE 0 END) AS nb_retards
+            FROM banque_remboursement r
+            JOIN banque_pret p ON r.id_pret = p.id
+            JOIN banque_type_pret t ON p.id_type_pret = t.id
+            WHERE r.date_paiement BETWEEN ? AND ?
+            GROUP BY mois
+            ORDER BY mois ASC
+        ");
+        $stmt->execute([$dateDebut, $dateFin]);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Ajouter l’intérêt prévu = intérêt réel si payé
+        foreach ($data as &$ligne) {
+            $ligne['interet_prevu'] = $ligne['interet_reel'];
+        }
+
+        return $data;
+    }
 }

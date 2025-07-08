@@ -514,6 +514,7 @@
           <thead>
             <tr>
               <th>Mois</th>
+              <th>Mensualité (VPM)</th>
               <th>Intérêt Prévu</th>
               <th>Intérêt Réel</th>
               <th>Remboursements</th>
@@ -640,101 +641,209 @@
     });
 
     function afficherGraphique(donnees) {
-      const tbody = document.getElementById("resultatTableBody");
-      const graphiqueCard = document.getElementById("graphiqueCard");
-      const tableauCard = document.getElementById("tableauCard");
-      const emptyState = document.getElementById("empty-state");
-      
-      tbody.innerHTML = "";
-      
-      if (donnees.length === 0) {
-        emptyState.style.display = "block";
-        graphiqueCard.classList.add("hidden");
-        tableauCard.classList.add("hidden");
-        return;
-      }
+        const tbody = document.getElementById("resultatTableBody");
+        const graphiqueCard = document.getElementById("graphiqueCard");
+        const tableauCard = document.getElementById("tableauCard");
+        const emptyState = document.getElementById("empty-state");
 
-      emptyState.style.display = "none";
-      graphiqueCard.classList.remove("hidden");
-      tableauCard.classList.remove("hidden");
+        tbody.innerHTML = "";
 
-      const labels = [], prevus = [], reels = [];
-
-      donnees.forEach(ligne => {
-        labels.push(ligne.mois);
-        prevus.push(parseFloat(ligne.interet_prevu));
-        reels.push(parseFloat(ligne.interet_reel));
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><strong>${ligne.mois}</strong></td>
-          <td><span class="amount-badge amount-prevu">${parseFloat(ligne.interet_prevu).toLocaleString()} Ar</span></td>
-          <td><span class="amount-badge amount-reel">${parseFloat(ligne.interet_reel).toLocaleString()} Ar</span></td>
-          <td><span class="stats-badge">${ligne.nb_remboursements}</span></td>
-          <td><span class="stats-badge ${ligne.nb_retards > 0 ? 'retard-badge' : ''}">${ligne.nb_retards}</span></td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      const ctx = document.getElementById("graphique").getContext("2d");
-      if (chart) chart.destroy();
-
-      chart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: "Intérêt Prévu",
-              data: prevus,
-              backgroundColor: "rgba(79, 172, 254, 0.8)",
-              borderColor: "#4facfe",
-              borderWidth: 1
-            },
-            {
-              label: "Intérêt Réel",
-              data: reels,
-              backgroundColor: "rgba(39, 174, 96, 0.8)",
-              borderColor: "#27ae60",
-              borderWidth: 1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: {
-                color: '#ffffff'
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: '#8b949e'
-              },
-              grid: {
-                color: '#30363d'
-              }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                color: '#8b949e',
-                callback: function(value) {
-                  return value.toLocaleString() + ' Ar';
-                }
-              },
-              grid: {
-                color: '#30363d'
-              }
-            }
-          }
+        if (donnees.length === 0) {
+            emptyState.style.display = "block";
+            graphiqueCard.classList.add("hidden");
+            tableauCard.classList.add("hidden");
+            return;
         }
-      });
-    }
+
+        emptyState.style.display = "none";
+        graphiqueCard.classList.remove("hidden");
+        tableauCard.classList.remove("hidden");
+
+        const labels = [], mensualites = [], interetsPrevus = [], interetsReels = [];
+
+        donnees.forEach(ligne => {
+            labels.push(ligne.mois);
+            mensualites.push(parseFloat(ligne.mensualite_vpm));
+            interetsPrevus.push(parseFloat(ligne.interet_prevu));
+            interetsReels.push(parseFloat(ligne.interet_reel));
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+            <td><strong>${ligne.mois}</strong></td>
+            <td><span class="amount-badge">${parseFloat(ligne.mensualite_vpm).toLocaleString()} Ar</span></td>
+            <td><span class="amount-badge amount-prevu">${parseFloat(ligne.interet_prevu).toLocaleString()} Ar</span></td>
+            <td><span class="amount-badge amount-reel">${parseFloat(ligne.interet_reel).toLocaleString()} Ar</span></td>
+            <td><span class="stats-badge">${ligne.nb_remboursements}</span></td>
+            <td><span class="stats-badge ${ligne.nb_retards > 0 ? 'retard-badge' : ''}">${ligne.nb_retards}</span></td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        const ctx = document.getElementById("graphique").getContext("2d");
+        if (chart) chart.destroy();
+
+        chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+            labels: labels,
+            datasets: [
+                {
+                label: "Mensualité (VPM)",
+                data: mensualites,
+                backgroundColor: "rgba(102, 126, 234, 0.7)",
+                borderColor: "#667eea",
+                borderWidth: 1
+                },
+                {
+                label: "Intérêt Prévu",
+                data: interetsPrevus,
+                backgroundColor: "rgba(79, 172, 254, 0.8)",
+                borderColor: "#4facfe",
+                borderWidth: 1
+                },
+                {
+                label: "Intérêt Réel",
+                data: interetsReels,
+                backgroundColor: "rgba(39, 174, 96, 0.8)",
+                borderColor: "#27ae60",
+                borderWidth: 1
+                }
+            ]
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                labels: {
+                    color: '#ffffff'
+                }
+                }
+            },
+            scales: {
+                x: {
+                ticks: {
+                    color: '#8b949e'
+                },
+                grid: {
+                    color: '#30363d'
+                }
+                },
+                y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#8b949e',
+                    callback: function(value) {
+                    return value.toLocaleString() + ' Ar';
+                    }
+                },
+                grid: {
+                    color: '#30363d'
+                }
+                }
+            }
+            }
+        });
+        }
+
+
+    // function afficherGraphique(donnees) {
+    //   const tbody = document.getElementById("resultatTableBody");
+    //   const graphiqueCard = document.getElementById("graphiqueCard");
+    //   const tableauCard = document.getElementById("tableauCard");
+    //   const emptyState = document.getElementById("empty-state");
+      
+    //   tbody.innerHTML = "";
+      
+    //   if (donnees.length === 0) {
+    //     emptyState.style.display = "block";
+    //     graphiqueCard.classList.add("hidden");
+    //     tableauCard.classList.add("hidden");
+    //     return;
+    //   }
+
+    //   emptyState.style.display = "none";
+    //   graphiqueCard.classList.remove("hidden");
+    //   tableauCard.classList.remove("hidden");
+
+    //   const labels = [], prevus = [], reels = [];
+
+    //   donnees.forEach(ligne => {
+    //     labels.push(ligne.mois);
+    //     prevus.push(parseFloat(ligne.interet_prevu));
+    //     reels.push(parseFloat(ligne.interet_reel));
+
+    //     const tr = document.createElement("tr");
+    //     tr.innerHTML = `
+    //       <td><strong>${ligne.mois}</strong></td>
+    //       <td><span class="amount-badge amount-prevu">${parseFloat(ligne.interet_prevu).toLocaleString()} Ar</span></td>
+    //       <td><span class="amount-badge amount-reel">${parseFloat(ligne.interet_reel).toLocaleString()} Ar</span></td>
+    //       <td><span class="stats-badge">${ligne.nb_remboursements}</span></td>
+    //       <td><span class="stats-badge ${ligne.nb_retards > 0 ? 'retard-badge' : ''}">${ligne.nb_retards}</span></td>
+    //     `;
+    //     tbody.appendChild(tr);
+    //   });
+
+    //   const ctx = document.getElementById("graphique").getContext("2d");
+    //   if (chart) chart.destroy();
+
+    //   chart = new Chart(ctx, {
+    //     type: "bar",
+    //     data: {
+    //       labels: labels,
+    //       datasets: [
+    //         {
+    //           label: "Intérêt Prévu",
+    //           data: prevus,
+    //           backgroundColor: "rgba(79, 172, 254, 0.8)",
+    //           borderColor: "#4facfe",
+    //           borderWidth: 1
+    //         },
+    //         {
+    //           label: "Intérêt Réel",
+    //           data: reels,
+    //           backgroundColor: "rgba(39, 174, 96, 0.8)",
+    //           borderColor: "#27ae60",
+    //           borderWidth: 1
+    //         }
+    //       ]
+    //     },
+    //     options: {
+    //       responsive: true,
+    //       maintainAspectRatio: false,
+    //       plugins: {
+    //         legend: {
+    //           labels: {
+    //             color: '#ffffff'
+    //           }
+    //         }
+    //       },
+    //       scales: {
+    //         x: {
+    //           ticks: {
+    //             color: '#8b949e'
+    //           },
+    //           grid: {
+    //             color: '#30363d'
+    //           }
+    //         },
+    //         y: {
+    //           beginAtZero: true,
+    //           ticks: {
+    //             color: '#8b949e',
+    //             callback: function(value) {
+    //               return value.toLocaleString() + ' Ar';
+    //             }
+    //           },
+    //           grid: {
+    //             color: '#30363d'
+    //           }
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
 
     window.onload = () => {
       remplirSelects();

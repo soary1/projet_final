@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Accueil Agent - Banque</title>
+</head>
+<body>
+
+  <h1>Espace Agent - Banque</h1>
+
+  <a href="pres/liste_prets.html">Voir les prêts en attente</a>
+  <a href="fond.php">Ajouter un fond</a>
+  <a href="simulation.php">Simulation Pret</a>
+  <a href="interet.php">Interet</a>
+  <a href="pres/liste_prets.html">Pret Client</a>
+
+  <script>
+    function logout() {
+      fetch("http://localhost/projet_final/ws/logout", {
+        method: "POST"
+      })
+      .then(() => {
+        window.location.href = "/projet_final/login.php";
+      })
+      .catch(() => {
+        window.location.href = "/projet_final/login.php";
+      });
+    }
+  </script>
+</body>
+</html>

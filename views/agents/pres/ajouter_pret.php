@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+// ⚠️ Sécurité : redirige si l'agent n'est pas connecté
+if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'agent') {
+    header("Location: /projet_final/views/agents/login.php");
+    exit;
+}
+
+$id_agent = $_SESSION['id'];
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,7 +24,6 @@
   <h1>Ajouter un Prêt</h1>
 
   <div>
-    <!-- Remplace l'input par un select pour choisir le client -->
     <select id="id_client">
       <option value="">-- Choisir un client --</option>
     </select>
@@ -27,14 +38,19 @@
 
   <script>
     const apiBase = "http://localhost/projet_final/ws";
+    const idAgent = <?= json_encode($id_agent) ?>; // Injecté côté PHP
 
     function ajax(method, url, data, callback) {
       const xhr = new XMLHttpRequest();
       xhr.open(method, apiBase + url, true);
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          callback && callback(JSON.parse(xhr.responseText));
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            callback && callback(JSON.parse(xhr.responseText));
+          } else {
+            alert("Erreur : " + xhr.status);
+          }
         }
       };
       xhr.send(data);
@@ -74,8 +90,9 @@
         return;
       }
 
-      const data = `id_client=${id_client}&id_type_pret=${id_type_pret}&montant=${montant}`;
-      ajax("POST", `/prets/clients/${id_client}`, data, () => {
+      const data = `id_client=${id_client}&id_agent=${idAgent}&id_type_pret=${id_type_pret}&montant=${montant}`;
+
+      ajax("POST", `/prets`, data, () => {
         alert("Prêt soumis avec succès !");
         document.getElementById("id_client").value = "";
         document.getElementById("id_type_pret").value = "";
@@ -83,7 +100,6 @@
       });
     }
 
-    // Chargement au démarrage
     chargerClients();
     chargerTypesPret();
   </script>

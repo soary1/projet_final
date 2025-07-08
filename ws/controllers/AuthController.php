@@ -95,7 +95,17 @@
 
 
 
-    
+   
+    public function createSession() {
+        $data = Flight::request()->data;
+        $userId = $data['id'] ?? null;
+        if ($userId) {
+            $_SESSION['user_id'] = $userId;
+            Flight::json(['status' => 'success', 'message' => 'Session créée']);
+        } else {
+            Flight::json(['status' => 'error', 'message' => 'ID utilisateur manquant'], 400);
+        }
+    }
     
     /**
      * Afficher la page de login pour les agents
@@ -191,14 +201,8 @@
      * Déconnexion
      */
     public function logout() {
-        $userType = $_SESSION['user']['type'] ?? 'agent';
         session_destroy();
-        
-        if ($userType === 'admin') {
-            Flight::redirect('/projet_final/ws/admin/login');
-        } else {
-            Flight::redirect('/projet_final/ws/agent/login');
-        }
+        Flight::redirect('/projet_final/ws/login');
     }
     
     /**

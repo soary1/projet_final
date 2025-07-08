@@ -95,11 +95,12 @@ drop database if exists banque;
     );
 
     -- Insertion des données par défaut
-    -- Créer un utilisateur administrateur par défaut
-    INSERT INTO banque_utilisateur (nom, email, mot_de_passe) VALUES 
-    ('Administrateur Principal', 'admin@banque.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'), -- password
-    ('Jean Martin', 'agent@banque.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'), -- password
-    ('Marie Dubois', 'client@banque.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'); -- password
+    INSERT INTO banque_utilisateur (nom, email, mot_de_passe) VALUES
+('Jean Dupont', 'jean.dupont@example.com', 'password123'),
+('Claire Bernard', 'claire.bernard@example.com', 'client123'),
+('Sophie Agent', 'sophie.agent@example.com', 'agent123'),
+('Admin Master', 'admin@banque.com', 'admin123');
+
 
     -- Créer le profil admin associé
     INSERT INTO banque_admin (id_utilisateur, niveau_acces) VALUES 

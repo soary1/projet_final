@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+// Vérifie si l'utilisateur connecté est un agent
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: /projet_final/views/agents/login.php");
+//     exit;
+// }
+
+$id_agent = $_SESSION['user_id'];
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -34,7 +46,8 @@
       <option value="">-- Type de fond --</option>
     </select>
 
-    <input type="number" id="id_agent" placeholder="ID Agent" required>
+    <!-- Plus besoin de champ id_agent visible -->
+    <input type="hidden" id="id_agent" value="<?= htmlspecialchars($id_agent) ?>">
 
     <button type="submit">Ajouter</button>
   </form>
@@ -62,6 +75,11 @@
       const id_type_fond = document.getElementById("id_type_fond").value;
       const id_agent = document.getElementById("id_agent").value;
 
+      if (!montant || !id_type_fond || !id_agent) {
+        alert("Veuillez remplir tous les champs.");
+        return;
+      }
+
       const data = `montant=${encodeURIComponent(montant)}&id_type_fond=${id_type_fond}&id_agent=${id_agent}`;
 
       fetch(apiBase + "/fond", {
@@ -71,7 +89,7 @@
       })
       .then(res => res.json())
       .then(resp => {
-        alert(resp.message);
+        alert(resp.message || "Fond ajouté avec succès !");
         document.querySelector("form").reset();
       });
     }

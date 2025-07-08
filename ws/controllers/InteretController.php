@@ -19,4 +19,22 @@ class InteretController {
             ], 500);
         }
     }
+
+    public static function interetsParMois() {
+        $moisDebut = $_GET['mois_debut'] ?? null;
+        $anneeDebut = $_GET['annee_debut'] ?? null;
+        $moisFin = $_GET['mois_fin'] ?? null;
+        $anneeFin = $_GET['annee_fin'] ?? null;
+
+        if (!$moisDebut || !$anneeDebut || !$moisFin || !$anneeFin) {
+            Flight::json(['success' => false, 'message' => 'Paramètres manquants.'], 400);
+            return;
+        }
+
+        $dateDebut = "$anneeDebut-$moisDebut-01";
+        $dateFin = date("Y-m-t", strtotime("$anneeFin-$moisFin-01"));
+
+        $resultats = Remboursement::getInteretsPrevusEtReels($dateDebut, $dateFin);
+        Flight::json(['success' => true, 'data' => $resultats]);
+    }
 }

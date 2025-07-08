@@ -29,10 +29,10 @@ class PretController {
     }
 
     
-  public static function getAllPrets(): void
-    {
-        Flight::json(Pret::all());
-    }
+//   public static function getAllPrets(): void
+//     {
+//         Flight::json(Pret::all());
+//     }
   
     public static function listPretByClient($id): void
     {
@@ -50,6 +50,11 @@ class PretController {
     {
         Pret::delete($id);
         Flight::json(null, 204);
+    }
+
+    public static function getAllPrets(): void
+    {
+        Flight::json(Pret::allWithTypePret()); 
     }
 
 

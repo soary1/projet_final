@@ -12,6 +12,7 @@ require 'routes/client_routes.php';
 require 'routes/pres_routes.php';
 require 'routes/type_pret_route.php';
 require 'routes/utilisateur_routes.php';
+require 'routes/remboursement_routes.php';
 
 
 Flight::start();

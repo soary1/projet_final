@@ -83,6 +83,9 @@ public static function simulerPret() {
 
             if ($taux_mensuel > 0 && $duree > 0) {
                 $mensualite = $montant * $taux_mensuel / (1 - pow(1 + $taux_mensuel, -$duree));
+                $somme_assurance = $montant * ($assurance / 100);
+                $assurance_mensuelle = $somme_assurance / $duree;
+                $mensualite += $assurance_mensuelle;
                 $interet_total = ($mensualite * $duree) - $montant;
             }
 

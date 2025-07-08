@@ -42,21 +42,92 @@ class Remboursement {
     $delai = (int) $pret['delai_defaut'];
     $dateDemande = new DateTime($pret['date_demande']);
 
-    // 2. Calculer la mensualité (annuité constante)
+    // 2. Calcul de la mensualité (annuité constante)
     $tauxMensuel = $tauxAnnuel / 100 / 12;
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
     $mensualite = round($mensualite, 2);
 
-    // 3. Calculer la date d’échéance
-    $dateEcheance = $dateDemande->modify("+$delai days")->format('Y-m-d');
+    // 3. Compter le nombre de remboursements déjà effectués
+    $stmt = $db->prepare("SELECT COUNT(*) FROM banque_remboursement WHERE id_pret = ?");
+    $stmt->execute([$idPret]);
+    $remboursementsExistants = (int) $stmt->fetchColumn();
 
-    // 4. Enregistrement
+    // 4. Vérifier si tout est déjà payé
+    if ($remboursementsExistants >= $duree) {
+        return false; // plus rien à rembourser
+    }
+
+    // 5. Calculer la prochaine date d’échéance
+    $dateEcheance = $dateDemande->modify("+$delai days")->modify("+{$remboursementsExistants} months");
+    $dateEcheanceStr = $dateEcheance->format('Y-m-d');
+
+    // 6. Insérer la prochaine échéance
     $st = $db->prepare("
         INSERT INTO banque_remboursement (id_pret, montant, date_paiement, date_echeance)
         VALUES (?, ?, ?, ?)
     ");
-    return $st->execute([$idPret, $mensualite, $datePaiement, $dateEcheance]);
+    return $st->execute([$idPret, $mensualite, $datePaiement, $dateEcheanceStr]);
 }
+
+public static function rembourserNmois(int $idPret, int $nbMois): bool {
+    $db = getDB();
+
+    $stmt = $db->prepare("
+        SELECT p.date_demande, p.montant AS montant_pret,
+               tp.taux_interet, tp.duree_mois, tp.delai_defaut
+        FROM banque_pret p
+        JOIN banque_type_pret tp ON tp.id = p.id_type_pret
+        WHERE p.id = ?
+    ");
+    $stmt->execute([$idPret]);
+    $pret = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$pret) return false;
+
+    $montant = (float) $pret['montant_pret'];
+    $tauxAnnuel = (float) $pret['taux_interet'];
+    $duree = (int) $pret['duree_mois'];
+    $delai = (int) $pret['delai_defaut'];
+    $dateDemande = new DateTime($pret['date_demande']);
+
+    // Mensualité
+    $tauxMensuel = $tauxAnnuel / 100 / 12;
+    $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
+    $mensualite = round($mensualite, 2);
+
+    // Récupérer les échéances déjà payées
+    $stmt = $db->prepare("SELECT date_echeance FROM banque_remboursement WHERE id_pret = ?");
+    $stmt->execute([$idPret]);
+    $existantes = array_map(fn($d) => (new DateTime($d))->format('Y-m-d'), $stmt->fetchAll(PDO::FETCH_COLUMN));
+
+    $dateDepart = $dateDemande->modify("+$delai days");
+
+    $insert = $db->prepare("
+        INSERT INTO banque_remboursement (id_pret, montant, date_paiement, date_echeance)
+        VALUES (?, ?, ?, ?)
+    ");
+
+    $nbAjoute = 0;
+    for ($i = 0, $mois = 0; $i < $duree && $nbAjoute < $nbMois; $i++) {
+        $echeance = clone $dateDepart;
+        $echeance->modify("+$i months");
+        $dateStr = $echeance->format('Y-m-d');
+
+        if (in_array($dateStr, $existantes)) continue;
+
+        $insert->execute([
+            $idPret,
+            $mensualite,
+            $dateStr,
+            $dateStr
+        ]);
+
+        $nbAjoute++;
+    }
+
+    return true;
+}
+
 public static function rembourserTout(int $idPret): bool {
     $db = getDB();
 

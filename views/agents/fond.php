@@ -1,13 +1,14 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
+
+if (!isset($_SESSION['user']['id']) || $_SESSION['user']['role'] !== 'agent') {
     header("Location: /projet_final/views/agents/login.php");
     exit;
 }
-
-$id_agent = $_SESSION['user'];
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -45,14 +46,35 @@ $id_agent = $_SESSION['user'];
       <option value="">-- Type de fond --</option>
     </select>
 
-    <!-- Plus besoin de champ id_agent visible -->
-    <input type="hidden" id="id_agent" value="<?= htmlspecialchars($id_agent) ?>">
+    <input type="hidden" id="id_agent" placeholder="ID Agent" value="1">
 
     <button type="submit">Ajouter</button>
   </form>
 
   <script>
     const apiBase = "http://localhost/projet_final/ws";
+
+
+//     function chargerAgentDepuisSession() {
+//   fetch(apiBase + "/session_user")
+//     .then(res => {
+//       if (!res.ok) throw new Error("Non connecté");
+//       return res.json();
+//     })
+//     .then(data => {
+//       if (data.success && data.id_agent) {
+//         document.getElementById("id_agent").value = data.id_agent;
+//         console.log("ID agent chargé :", data.id_agent);
+//       } else {
+//         alert("Session invalide");
+//       }
+//     })
+//     .catch(err => {
+//       console.error("Erreur session :", err);
+//       alert("Veuillez vous reconnecter.");
+//       window.location.href = "/projet_final/views/agents/login.php";
+//     });
+// }
 
     function chargerTypesFond() {
       fetch(apiBase + "/typefond")
@@ -74,11 +96,6 @@ $id_agent = $_SESSION['user'];
       const id_type_fond = document.getElementById("id_type_fond").value;
       const id_agent = document.getElementById("id_agent").value;
 
-      if (!montant || !id_type_fond || !id_agent) {
-        alert("Veuillez remplir tous les champs.");
-        return;
-      }
-
       const data = `montant=${encodeURIComponent(montant)}&id_type_fond=${id_type_fond}&id_agent=${id_agent}`;
 
       fetch(apiBase + "/fond", {
@@ -88,11 +105,11 @@ $id_agent = $_SESSION['user'];
       })
       .then(res => res.json())
       .then(resp => {
-        alert(resp.message || "Fond ajouté avec succès !");
+        alert(resp.message);
         document.querySelector("form").reset();
       });
     }
-
+// chargerAgentDepuisSession();
     chargerTypesFond();
   </script>
 

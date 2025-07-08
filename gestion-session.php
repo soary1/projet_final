@@ -15,7 +15,7 @@ $_SESSION['user']['matricule'] = $_POST['matricule'] ?? null;
 $_SESSION['user']['profession'] = $_POST['profession'] ?? null;
 
 // Redirection selon le rôle
-switch ($_SESSION['role']) {
+switch ($_SESSION['user']['role']) {
   case 'admin':
     header('Location: views/admin/accueil.php');
     break;

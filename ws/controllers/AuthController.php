@@ -93,6 +93,22 @@
         }
     
 
+    public static function getSessionUser()
+    {
+        if (isset($_SESSION['user'])) {
+            Flight::json([
+                'success' => true,
+                'id_agent' => $_SESSION['user']['id'],
+                'role' => $_SESSION['user']['role'],
+                'user' => $_SESSION['user'] 
+            ], 200);
+        } else {
+            Flight::json([
+                'success' => false,
+                'message' => 'Utilisateur non connecté ou non autorisé'
+            ], 401);
+        }
+    }
 
 
    

@@ -100,6 +100,7 @@ function chargerPrets(idClient = "") {
         ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
           const taux_annuel = parseFloat(typeData.taux_interet);
           const duree_mois = parseInt(typeData.duree_mois);
+          const taux_assurance = parseInt(typeData.assurance);
           const nom = typeData.nom;
           const taux_mensuel = taux_annuel / 100 / 12;
 

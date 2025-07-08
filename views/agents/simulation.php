@@ -65,6 +65,13 @@
       gap: 0.5rem;
     }
 
+    .compare-row.highlight-winner {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+
     .sidebar-nav {
       padding: 0 1rem;
     }
@@ -435,6 +442,45 @@
         grid-template-columns: 1fr;
       }
     }
+    .comparison-grid {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.compare-card {
+  flex: 1;
+  min-width: 300px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-bg);
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.compare-card h4 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  text-align: center;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.compare-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+.compare-row span {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
   </style>
 </head>
 <body>
@@ -448,6 +494,7 @@
       <a href="#"><i class="bi bi-bar-chart"></i> Intérêts</a>
       <a href="#" class="active"><i class="bi bi-calculator"></i> Simulation</a>
       <a href="#"><i class="bi bi-gear"></i> Paramètres</a>
+      <!-- <button id="btnComparer" class="btn btn-gradient">Comparer les simulations</button> -->
     </nav>
   </div>
 
@@ -491,6 +538,13 @@
       <form id="simulationForm">
         <div class="form-grid">
           <div class="form-group">
+  <label><i class="bi bi-tags"></i> Type de prêt</label>
+  <select id="typePretSelect" class="form-control-modern">
+    <option value="">Choisir un type existant (optionnel)</option>
+  </select>
+</div>
+
+          <div class="form-group">
             <label><i class="bi bi-currency-dollar"></i> Montant (Ar)</label>
             <input type="number" step="1000" id="montant" class="form-control-modern" placeholder="Ex: 1000000" required>
           </div>
@@ -502,6 +556,16 @@
             <label><i class="bi bi-calendar"></i> Durée (mois)</label>
             <input type="number" id="duree" class="form-control-modern" placeholder="Ex: 240" required>
           </div>
+          <div class="form-group">
+  <label><i class="bi bi-shield-check"></i> Assurance (%)</label>
+  <input type="number" step="0.01" id="assurance" class="form-control-modern" placeholder="Ex: 0.5">
+</div>
+
+<div class="form-group">
+  <label><i class="bi bi-hourglass-split"></i> Délai de Défaut (mois)</label>
+  <input type="number" id="delai" class="form-control-modern" placeholder="Ex: 1">
+</div>
+
           <div class="form-group">
             <label style="opacity: 0;">Action</label>
             <button type="submit" class="btn-primary">
@@ -536,12 +600,22 @@
           <div class="form-group">
             <label style="opacity: 0;">Action</label>
             <button type="submit" class="btn-success">
-              <i class="bi bi-check-circle"></i> Enregistrer les prêts
+              <i class="bi bi-check-circle"></i> Enregistrer simulation
             </button>
           </div>
         </div>
       </form>
     </div>
+    <div id="comparaisonContainer" class="card-modern hidden">
+  <div class="card-header">
+    <div class="icon"><i class="bi bi-columns-gap"></i></div>
+    <h3>Comparaison des Simulations</h3>
+  </div>
+  <div id="comparaisonResult" class="comparison-grid">
+    <!-- les fiches seront injectées ici -->
+  </div>
+</div>
+
 
     <div class="card-modern hidden" id="resultatCard">
       <div class="card-header">
@@ -562,7 +636,14 @@
               <th>Mensuel Simple</th>
               <th>Intérêt Composé Total</th>
               <th>Mensuel Composé</th>
+<th>Assurance Totale</th>
+<th>Assurance Mensuelle</th>
+<th>Délai défaut</th>
+<th>Mensualité VPN</th>
+
               <th>Action</th>
+
+
             </tr>
           </thead>
           <tbody id="resultats"></tbody>
@@ -575,6 +656,45 @@
       </div>
     </div>
   </div>
+
+<div style="display: flex; justify-content: center;">
+  <div class="card-modern" id="listeSimulations">
+      <div class="card-header">
+          <div class="icon">
+              <i class="bi bi-clock-history"></i>
+          </div>
+          <h3>Historique des simulations enregistrées</h3>
+      </div>
+      <div class="table-container">
+          <table class="table-modern">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>Client</th>
+                      <th>Montant</th>
+                      <th>Taux</th>
+                      <th>Durée</th>
+                      <th>Mensualité</th>
+                      <th>Assurance</th>
+                      <th>Délai défaut</th>
+                      <th>Sélectionner</th>
+                  </tr>
+              </thead>
+              <tbody id="historique-simulations">
+                  <tr><td colspan="10">Chargement...</td></tr>
+              </tbody>
+          </table>
+
+          <button onclick="compareSimulations()" class="btn-primary" style="margin-top: 20px;">
+              Comparer les simulations sélectionnées
+          </button>
+      </div>
+  </div>
+</div>
+
+
+
+
 
   <script>
     const simulations = [];
@@ -591,6 +711,129 @@
         setTimeout(() => document.body.removeChild(notification), 300);
       }, 3000);
     }
+    function chargerListeSimulations() {
+  fetch("http://localhost/projet_final/ws/simulations")
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("historique-simulations");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Aucune simulation enregistrée</td></tr>`;
+        return;
+      }
+
+      data.forEach((s, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${s.id_client || "—"}</td>
+        <td>${parseFloat(s.montant).toLocaleString()} Ar</td>
+        <td>${s.taux_annuel}%</td>
+        <td>${s.duree_mois} mois</td>
+        <td>${parseFloat(s.mensualite).toLocaleString()} Ar</td>
+        <td>${parseFloat(s.assurance || 0).toLocaleString()}%</td>
+        <td>${s.delai || 0} mois</td>
+        <td>
+            <input type="checkbox" class="compare-checkbox" data-id="${s.id}">
+        </td>
+    `;
+    tbody.appendChild(tr);
+});
+
+    })
+    .catch(() => {
+      document.getElementById("historique-simulations").innerHTML = `
+        <tr><td colspan="10" class="text-danger">Erreur lors du chargement des données</td></tr>
+      `;
+    });
+}
+function compareSimulations() {
+    // Récupérer les simulations sélectionnées
+    const selectedSimulations = document.querySelectorAll('.compare-checkbox:checked');
+    
+    if (selectedSimulations.length !== 2) {
+        alert('Veuillez sélectionner exactement deux simulations pour la comparaison.');
+        return;
+    }
+
+    // Récupérer les IDs des simulations sélectionnées
+    const simulationIds = Array.from(selectedSimulations).map(checkbox => checkbox.dataset.id);
+    
+    // Effectuer une requête AJAX vers la route /comparaison avec les IDs des simulations
+fetch("http://localhost/projet_final/ws/comparaison?ids=" + simulationIds.join(','))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Traitement des données de comparaison
+                afficherComparaison(data.simulations);
+            } else {
+                alert('Erreur: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération des données:', error);
+            alert('Une erreur s\'est produite lors de la comparaison des simulations.');
+        });
+}
+
+function afficherComparaison(simulations) {
+  const container = document.getElementById("comparaisonContainer");
+  const grid = document.getElementById("comparaisonResult");
+
+  container.classList.remove("hidden");
+  grid.innerHTML = "";
+
+  const champs = [
+    { label: "Montant", key: "montant", lowerIsBetter: true },
+    { label: "Taux annuel", key: "taux_annuel", lowerIsBetter: true },
+    { label: "Durée", key: "duree_mois", lowerIsBetter: true },
+    { label: "Mensualite", key: "mensualite", lowerIsBetter: true },
+    { label: "Assurance", key: "assurance", lowerIsBetter: true },
+    // { label: "Délai de défaut", key: "delai_defaut", lowerIsBetter: false }
+  ];
+
+  const cartes = [[], []]; // stocke les lignes HTML de chaque carte
+
+  champs.forEach(champ => {
+    const [val1, val2] = simulations.map(s => parseFloat(s[champ.key] ?? 0));
+    let gagnant = null;
+
+    if (!isNaN(val1) && !isNaN(val2) && val1 !== val2) {
+      gagnant = champ.lowerIsBetter ? (val1 < val2 ? 0 : 1) : (val1 > val2 ? 0 : 1);
+    }
+
+    simulations.forEach((s, i) => {
+      const valeur = s[champ.key] ?? "—";
+      const formatée = typeof valeur === "number" || !isNaN(parseFloat(valeur))
+        ? parseFloat(valeur).toLocaleString()
+        : valeur;
+
+      cartes[i].push(`
+        <div class="compare-row ${i === gagnant ? "highlight-winner" : ""}">
+          <div>${champ.label}</div>
+          <span>${formatée}${champ.label.includes("Montant") || champ.label.includes("Mensualite") ? " Ar" : champ.label.includes("Taux") || champ.label.includes("Assurance") ? "%" : champ.label.includes("Durée") || champ.label.includes("défaut") ? " mois" : ""}</span>
+        </div>
+      `);
+    });
+  });
+
+  simulations.forEach((s, i) => {
+    const card = document.createElement("div");
+    card.className = "compare-card";
+    card.innerHTML = `
+      <h4>Simulation ${i + 1}</h4>
+      <div class="compare-row"><div>Client</div><span>${s.id_client}</span></div>
+      ${cartes[i].join("")}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+
+
+
+
 
     function updateStats() {
       const totalSimulations = simulations.length;
@@ -645,6 +888,18 @@
           showNotification('Erreur lors du chargement des clients et agents', 'error');
         });
     }
+    fetch("http://localhost/projet_final/ws/types-pret")
+  .then(res => res.json())
+  .then(data => {
+    const select = document.getElementById("typePretSelect");
+    data.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(t);
+      opt.textContent = `${t.nom} (${t.taux_interet}% / ${t.duree_mois} mois / ${t.assurance}% / ${t.delai_defaut}j)`;
+      select.appendChild(opt);
+    });
+  });
+
 
     function supprimerSimulation(index) {
       simulations.splice(index, 1);
@@ -659,14 +914,15 @@
       const montant = parseFloat(document.getElementById("montant").value);
       const taux = parseFloat(document.getElementById("taux").value);
       const duree = parseInt(document.getElementById("duree").value);
+      const assurance = parseFloat(document.getElementById("assurance").value || 0);
+const delai = parseInt(document.getElementById("delai").value || 0);
 
       if (montant <= 0 || taux <= 0 || duree <= 0) {
         showNotification('Veuillez saisir des valeurs positives', 'error');
         return;
       }
 
-      simulations.push({ montant, taux, duree });
-      afficherResultats();
+simulations.push({ montant, taux, duree, assurance, delai });      afficherResultats();
       updateStats();
       
       // Reset form
@@ -705,6 +961,13 @@
           interet_compose_total = total_rembourse - s.montant;
           interet_compose_mensuel = interet_compose_total / s.duree;
         }
+        const assurance_total = s.montant * (s.assurance / 100);
+const assurance_mensuelle = assurance_total / s.duree;
+const mensualite_composee = interet_compose_mensuel + (s.montant / s.duree); // mensualité calculée déjà
+const mensualite_vpn = mensualite_composee + assurance_mensuelle;
+// const mensualite_vpn = (s.montant * (s.taux / 100 / 12)) / (1 - Math.pow(1 + (s.taux / 100 / 12), -s.duree)) + assurance_mensuelle;
+
+
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -716,6 +979,13 @@
           <td><span class="amount-badge amount-simple">${interet_simple_mensuel.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ar</span></td>
           <td><span class="amount-badge amount-compose">${interet_compose_total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ar</span></td>
           <td><span class="amount-badge amount-compose">${interet_compose_mensuel.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ar</span></td>
+          <td><span class="amount-badge amount-principal">${assurance_total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ar</span></td>
+<td><span class="amount-badge amount-principal">${assurance_mensuelle.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ar</span></td>
+
+<td>${s.delai} mois</td>
+<td><span class="amount-badge amount-principal">${mensualite_vpn.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ar</span></td>
+
+
           <td>
             <button onclick="supprimerSimulation(${index})" style="background: var(--secondary-gradient); border: none; color: white; padding: 0.5rem; border-radius: 6px; cursor: pointer;">
               <i class="bi bi-trash"></i>
@@ -793,9 +1063,37 @@
     });
 
     window.onload = () => {
-      chargerClientsEtAgents();
-      updateStats();
-    };
+  chargerClientsEtAgents();
+  chargerListeSimulations();
+
+  updateStats();
+  
+
+  // Charger les types de prêt + écouter les changements
+  fetch("http://localhost/projet_final/ws/types-pret")
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById("typePretSelect");
+      data.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(t);
+        opt.textContent = `${t.nom} (${t.taux_interet}% / ${t.duree_mois} mois / ${t.assurance}% / ${t.delai_defaut}j)`;
+        select.appendChild(opt);
+      });
+
+      // Ajoute l'écouteur ici (après avoir rempli le select)
+      select.addEventListener("change", function () {
+        const value = this.value;
+        if (!value) return;
+        const type = JSON.parse(value);
+        document.getElementById("taux").value = type.taux_interet;
+        document.getElementById("duree").value = type.duree_mois;
+        document.getElementById("assurance").value = type.assurance;
+        document.getElementById("delai").value = type.delai_defaut;
+      });
+    });
+};
+
   </script>
 </body>
 </html>

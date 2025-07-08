@@ -96,10 +96,10 @@ drop database if exists banque;
 
     -- Insertion des données par défaut
     INSERT INTO banque_utilisateur (nom, email, mot_de_passe) VALUES
-('Jean Dupont', 'jean.dupont@example.com', 'password123'),
-('Claire Bernard', 'claire.bernard@example.com', 'client123'),
-('Sophie Agent', 'sophie.agent@example.com', 'agent123'),
-('Admin Master', 'admin@banque.com', 'admin123');
+    ('Jean Dupont', 'jean.dupont@example.com', 'password123'),
+    ('Claire Bernard', 'claire.bernard@example.com', 'client123'),
+    ('Sophie Agent', 'sophie.agent@example.com', 'agent123'),
+    ('Admin Master', 'admin@banque.com', 'admin123');
 
 
     -- Créer le profil admin associé

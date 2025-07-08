@@ -1,0 +1,133 @@
+<?php
+require_once 'models/Remboursement.php';
+require_once 'controllers/AuthController.php';
+
+class RemboursementController {
+
+    /**
+     * Lister tous les remboursements
+     */
+    public function getAll() {
+        if (!AuthController::requireAdmin()) return;
+
+        try {
+            $remboursements = Remboursement::all();
+            Flight::json([
+                'success' => true,
+                'data' => $remboursements
+            ]);
+        } catch (PDOException $e) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des remboursements'
+            ]);
+        }
+    }
+
+    /**
+     * Récupérer les remboursements d'un prêt donné
+     */
+    public function getByPret($idPret) {
+        if (!AuthController::requireAdmin()) return;
+
+        try {
+            $data = Remboursement::byPret($idPret);
+            Flight::json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (PDOException $e) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des remboursements du prêt'
+            ]);
+        }
+    }
+
+    /**
+     * Créer un remboursement
+     */
+    public function create() {
+        if (!AuthController::requireAdmin()) return;
+
+        $idPret = $_POST['id_pret'] ?? null;
+$datePaiement = $_POST['date_paiement'] ?? null;
+
+if (!$idPret || !$datePaiement) {
+    Flight::json([
+        'success' => false,
+        'message' => 'ID prêt et date de paiement sont requis'
+    ]);
+    return;
+}
+
+
+        try {
+            $ok = Remboursement::create($idPret, $datePaiement);
+            if ($ok) {
+                Flight::json([
+                    'success' => true,
+                    'message' => 'Remboursement enregistré avec succès'
+                ]);
+            } else {
+                throw new Exception("Erreur d'insertion");
+            }
+        } catch (Exception $e) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur lors de la création du remboursement'
+            ]);
+        }
+    }
+
+    /**
+     * Supprimer un remboursement
+     */
+    public function delete($id) {
+        if (!AuthController::requireAdmin()) return;
+
+        try {
+            Remboursement::delete($id);
+            Flight::json([
+                'success' => true,
+                'message' => 'Remboursement supprimé'
+            ]);
+        } catch (PDOException $e) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression'
+            ]);
+        }
+    }
+
+    /**
+     * Liste des remboursements en retard
+     */
+    public function getRetards() {
+        if (!AuthController::requireAdmin()) return;
+
+        try {
+            $data = Remboursement::getRetards();
+            Flight::json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des retards'
+            ]);
+        }
+    }
+    public function rembourserTout($idPret) {
+    if (!AuthController::requireAdmin()) return;
+
+    $ok = Remboursement::rembourserTout($idPret);
+    if ($ok) {
+        Flight::json(['success' => true, 'message' => 'Toutes les mensualités ont été générées.']);
+    } else {
+        Flight::json(['success' => false, 'message' => 'Erreur lors du remboursement total.']);
+    }
+}
+
+}

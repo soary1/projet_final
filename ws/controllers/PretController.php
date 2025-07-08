@@ -29,10 +29,11 @@ class PretController {
     }
 
     
-  public static function getAllPrets(): void
-    {
-        Flight::json(Pret::all());
-    }
+public static function getAllPrets(): void
+{
+    Flight::json(Pret::allWithTypePret()); // ✅ OK : contient nom_type_pret et taux_interet
+}
+
   
     public static function listPretByClient($id): void
     {
@@ -56,7 +57,7 @@ class PretController {
     public static function ajouterType() {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'])) {
+        if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'], $data['assurance'])) {
             Flight::json(['success' => false, 'message' => 'Paramètres manquants.'], 400);
             return;
         }
@@ -64,18 +65,20 @@ class PretController {
         $nom = trim($data['nom']);
         $taux = floatval($data['taux_interet']);
         $duree = intval($data['duree_mois']);
+        $assurance = floatval($data['assurance']);
 
-        $dejaExistant = Pret::existe($taux, $duree);
+        $dejaExistant = Pret::existe($taux, $duree, $assurance);
         if ($dejaExistant) {
             Flight::json(['success' => false, 'message' => 'Type de prêt similaire existe déjà.'], 409);
             return;
         }
 
-        $ok = Pret::ajouterType($nom, $taux, $duree);
+        $ok = Pret::ajouterType($nom, $taux, $duree, $assurance);
         if ($ok) {
             Flight::json(['success' => true, 'message' => 'Type de prêt ajouté avec succès.']);
         } else {
             Flight::json(['success' => false, 'message' => 'Erreur lors de l\'ajout.'], 500);
         }
     }
+
 }

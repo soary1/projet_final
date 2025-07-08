@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/Pret.php';
+require_once __DIR__ . '/../models/Fond.php';
+
 
 class PretController {
     public static function getEnAttente() {
@@ -39,13 +41,23 @@ public static function getAllPrets(): void
     {
         Flight::json(Pret::byClient($id));
     }
-
     public static function createPret(int $idClient): void
     {
-        $d  = Flight::request()->data;
-        $id = Pret::create($idClient, $d['id_type_pret'], $d['montant']);
+        $d = Flight::request()->data;
+        $montant = floatval($d['montant']);
+        $date = $d['date_demande'];
+
+        $disponible = Fond::getDisponibleAtDate($date);
+
+        if ($montant > $disponible) {
+            Flight::json(['error' => 'Fonds de l\'établissement insuffisants à cette date'], 400);
+            return;
+        }
+
+        $id = Pret::create($idClient, $d['id_type_pret'], $montant, $date);
         Flight::json(['id' => $id], 200);
     }
+    
 
     public static function deletePret(int $id): void
     {
@@ -56,7 +68,7 @@ public static function getAllPrets(): void
 
     public static function ajouterType() {
         $data  = Flight::request()->data;
-        
+
         if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'], $data['assurance'])) {
             Flight::json(['success' => false, 'message' => 'Paramètres manquants.'], 400);
             return;

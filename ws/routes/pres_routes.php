@@ -15,5 +15,5 @@ Flight::route('GET /typefond', ['PretController', 'getTypesFond']);
 Flight::route('POST /fond', ['PretController', 'ajouterFond']);
 Flight::route('GET /clients-agents', ['SimulationController', 'getClientsEtAgents']);
 Flight::route('POST /simulation/valider', ['SimulationController', 'simulerPret']);
-Flight::route('POST /typepret', ['PretController', 'ajouterType']);
+// Flight::route('POST /typepret', ['PretController', 'ajouterType']);
 

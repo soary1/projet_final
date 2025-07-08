@@ -528,6 +528,24 @@ session_start();
           </div>
         </div>
 
+                  <div class="form-group">
+            <label for="date_demande">
+              <i class="bi bi-cash"></i>
+              Date d'emprunt <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="input-icon bi bi-currency-exchange"></i>
+              <input 
+                type="date" 
+                id="date_demande" 
+                class="form-control-modern with-icon" 
+                required
+              >
+            </div>
+          </div>
+        </div>
+
+
         <div class="button-group">
           <a href="liste_prets.html" class="btn-secondary">
             <i class="bi bi-arrow-left"></i>
@@ -642,6 +660,8 @@ session_start();
   const id_client = document.getElementById("id_client").value;
   const id_type_pret = document.getElementById("id_type_pret").value;
   const montant = document.getElementById("montant").value;
+  const date_demande = document.getElementById("date_demande").value;
+
 
   if (!id_client || !id_type_pret || !montant) {
     showAlert("Veuillez remplir tous les champs requis.", "error");
@@ -659,7 +679,8 @@ session_start();
     id_client: id_client,
     id_agent: 1, // ou remplace par ta variable idAgent si elle est globale
     id_type_pret: id_type_pret,
-    montant: montant
+    montant: montant,
+    date_demande: date_demande
   };
 
   fetch(`${apiBase}/prets/clients/${id_client}`, {
@@ -678,6 +699,7 @@ session_start();
         document.getElementById("id_client").value = "";
         document.getElementById("id_type_pret").value = "";
         document.getElementById("montant").value = "";
+        document.getElementById("date_demande").value = "";
 
         setTimeout(() => {
           window.location.href = "liste_prets.html";

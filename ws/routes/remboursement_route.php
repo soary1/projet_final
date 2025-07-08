@@ -6,4 +6,6 @@ Flight::route('POST /remboursements', [new RemboursementController(), 'create'])
 Flight::route('DELETE /remboursements/@id', [new RemboursementController(), 'delete']);
 Flight::route('GET /retards', [new RemboursementController(), 'getRetards']);
 Flight::route('POST /remboursements/tout/@idPret', [new RemboursementController(), 'rembourserTout']);
+Flight::route('POST /remboursements/nmois/@idPret', [new RemboursementController(), 'rembourserNmois']);
+
 

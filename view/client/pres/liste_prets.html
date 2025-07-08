@@ -83,8 +83,10 @@ function chargerPrets(idClient = "") {
 <td>
   <button onclick="exporterPDF(...)">📄 PDF</button>
   <button onclick="ouvrirFormRemboursement(${p.id})">💰 Rembourser</button>
-  <button onclick="rembourserTout(${p.id})">💳 Rembourser tout</button>
+  <button onclick="rembourserTout(${p.id})">💳 Tout</button>
+  <button onclick="ouvrirFormNmois(${p.id})">💸 N mois</button>
 </td>
+
 
       `;
       tbody.appendChild(tr);
@@ -201,7 +203,6 @@ function chargerPrets(idClient = "") {
 function fermerForm() {
   document.getElementById('form-remboursement').style.display = 'none';
 }
-
 function validerRemboursement() {
   const idPret = document.getElementById('remb-id-pret').value;
   const datePaiement = document.getElementById('remb-date-paiement').value;
@@ -214,10 +215,10 @@ function validerRemboursement() {
   const params = `id_pret=${idPret}&date_paiement=${datePaiement}`;
   ajax("POST", "/remboursements", params, (res) => {
     if (res.success) {
-      alert("💰 Remboursement enregistré !");
+      alert(res.message); // succès
       fermerForm();
     } else {
-      alert("Erreur : " + res.message);
+      alert("❌ " + res.message); // message d'erreur serveur
     }
   });
 }
@@ -225,9 +226,40 @@ function rembourserTout(idPret) {
   if (!confirm("Générer toutes les mensualités de ce prêt ?")) return;
 
   ajax("POST", `/remboursements/tout/${idPret}`, null, (res) => {
-    alert(res.message);
+    if (res.success) {
+      alert("✅ " + res.message);
+    } else {
+      alert("❌ " + (res.message || "Erreur inattendue"));
+    }
   });
 }
+
+function ouvrirFormNmois(idPret) {
+  document.getElementById('nmois-id-pret').value = idPret;
+  document.getElementById('nmois-nb').value = '';
+  document.getElementById('form-nmois').style.display = 'block';
+}
+
+function validerRemboursementNmois() {
+  const idPret = document.getElementById('nmois-id-pret').value;
+  const nb = document.getElementById('nmois-nb').value;
+
+  if (!nb || nb <= 0) {
+    alert("❗ Veuillez entrer un nombre de mois valide.");
+    return;
+  }
+
+  const params = `nb=${nb}`;
+  ajax("POST", `/remboursements/nmois/${idPret}`, params, (res) => {
+    if (res.success) {
+      alert("✅ " + res.message);
+      document.getElementById('form-nmois').style.display = 'none';
+    } else {
+      alert("❌ " + (res.message || "Erreur pendant le remboursement partiel"));
+    }
+  });
+}
+
 
 
 
@@ -242,6 +274,15 @@ function rembourserTout(idPret) {
   <button onclick="validerRemboursement()">✅ Valider</button>
   <button onclick="fermerForm()">❌ Annuler</button>
 </div>
+<div id="form-nmois" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">
+  <h3>Rembourser N mois</h3>
+  <input type="hidden" id="nmois-id-pret">
+  <label>Nombre de mois :</label>
+  <input type="number" id="nmois-nb" min="1" placeholder="Ex: 3"><br><br>
+  <button onclick="validerRemboursementNmois()">✅ Valider</button>
+  <button onclick="document.getElementById('form-nmois').style.display = 'none'">❌ Annuler</button>
+</div>
+
 
 </body>
 </html>

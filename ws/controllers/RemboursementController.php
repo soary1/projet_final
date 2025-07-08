@@ -129,5 +129,22 @@ if (!$idPret || !$datePaiement) {
         Flight::json(['success' => false, 'message' => 'Erreur lors du remboursement total.']);
     }
 }
+public function rembourserNmois($idPret) {
+    if (!AuthController::requireAdmin()) return;
+
+    $nb = $_POST['nb'] ?? null;
+    if (!$nb || $nb <= 0) {
+        Flight::json(['success' => false, 'message' => 'Nombre de mois invalide.']);
+        return;
+    }
+
+    $ok = Remboursement::rembourserNmois($idPret, (int)$nb);
+    if ($ok) {
+        Flight::json(['success' => true, 'message' => "$nb remboursement(s) ajouté(s)."]);
+    } else {
+        Flight::json(['success' => false, 'message' => 'Erreur pendant l\'ajout.']);
+    }
+}
+
 
 }

@@ -125,4 +125,7 @@ public static function byClient(int $idClient): array {
         $stmt = $db->prepare("INSERT INTO banque_type_pret (nom, taux_interet, duree_mois, assurance) VALUES (?, ?, ?, ?)");
         return $stmt->execute([$nom, $taux, $duree, $assurance]);
     }
+
+
+
 }

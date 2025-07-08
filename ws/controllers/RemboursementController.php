@@ -168,5 +168,30 @@ public function rembourserNmois($idPret) {
         Flight::json(['success' => true, 'data' => $resultats]);
     }
 
+        // public static function getInteretsPrevuReelParMois($dateDebut, $dateFin) {
+        //     $db = getDB();
+
+        //     $stmt = $db->prepare("
+        //         SELECT 
+        //             DATE_FORMAT(r.date_echeance, '%Y-%m') AS mois,
+        //             SUM((p.montant * t.taux_interet / 100) / t.duree_mois) AS interet_prevu,
+        //             SUM((p.montant * t.taux_interet / 100) / t.duree_mois) AS interet_reel,
+        //             COUNT(*) AS nb_remboursements,
+        //             SUM(CASE WHEN r.date_paiement > r.date_echeance THEN 1 ELSE 0 END) AS nb_retards
+        //         FROM banque_remboursement r
+        //         JOIN banque_pret p ON r.id_pret = p.id
+        //         JOIN banque_type_pret t ON p.id_type_pret = t.id
+        //         WHERE r.date_echeance BETWEEN ? AND ?
+        //         GROUP BY mois
+        //         ORDER BY mois ASC
+        //     ");
+        //     $stmt->execute([$dateDebut, $dateFin]);
+        //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // }
+
+
+
+
+
 
 }

@@ -258,4 +258,174 @@ public static function rembourserTout(int $idPret): bool {
 
         return $data;
     }
+
+    public static function calculerInteretsMensuels($montant, $taux_annuel, $duree_mois) {
+        $interet_mensuel_simple = ($montant * $taux_annuel / 100) / 12;
+
+        $i = ($taux_annuel / 100) / 12;
+
+        $mensualite = $montant * ($i / (1 - pow(1 + $i, -$duree_mois)));
+
+        $interet_total_compose = ($mensualite * $duree_mois) - $montant;
+        $interet_mensuel_compose = $interet_total_compose / $duree_mois;
+
+        return [
+            'interet_simple' => round($interet_mensuel_simple, 2),
+            'interet_compose' => round($interet_mensuel_compose, 2),
+            'mensualite' => round($mensualite, 2),
+        ];
+    }
+    // public static function getInteretsPrevuReelParMois($dateDebut, $dateFin) {
+    //     $db = getDB();
+
+    //     $stmt = $db->prepare("
+    //         SELECT 
+    //             mois.mois,
+    //             IFNULL(SUM(prets.interet_compose), 0) AS interet_prevu,
+    //             IFNULL(SUM(remb.interet_reel), 0) AS interet_reel,
+    //             IFNULL(SUM(remb.nb_remboursements), 0) AS nb_remboursements,
+    //             IFNULL(SUM(remb.nb_retards), 0) AS nb_retards
+    //         FROM (
+    //             SELECT DATE_FORMAT(DATE_ADD(:debut, INTERVAL n.n MONTH), '%Y-%m') AS mois
+    //             FROM (
+    //                 SELECT @rownum := @rownum + 1 AS n
+    //                 FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+    //                     UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
+    //                     UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d,
+    //                     (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+    //                     UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
+    //                     UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d2,
+    //                     (SELECT @rownum := 0) r
+    //             ) n
+    //             WHERE DATE_ADD(:debut, INTERVAL n.n MONTH) <= :fin
+    //         ) mois
+
+    //         LEFT JOIN (
+    //             SELECT 
+    //                 DATE_FORMAT(DATE_ADD(p.date_demande, INTERVAL n.n MONTH), '%Y-%m') AS mois_pret,
+    //                 ( (p.montant * ( (t.taux_interet / 100) / 12 )) / 
+    //                 (1 - POW(1 + ((t.taux_interet / 100) / 12), -t.duree_mois)) 
+    //                 ) - (p.montant / t.duree_mois) AS interet_compose
+    //             FROM banque_pret p
+    //             JOIN banque_type_pret t ON p.id_type_pret = t.id
+    //             JOIN (
+    //                 SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+    //                 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 
+    //                 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL SELECT 13 
+    //                 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 17 
+    //                 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20 UNION ALL SELECT 21 
+    //                 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24 UNION ALL SELECT 25 
+    //                 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28 UNION ALL SELECT 29 
+    //                 UNION ALL SELECT 30 UNION ALL SELECT 31 UNION ALL SELECT 32 UNION ALL SELECT 33 
+    //                 UNION ALL SELECT 34 UNION ALL SELECT 35 UNION ALL SELECT 36 UNION ALL SELECT 37 
+    //                 UNION ALL SELECT 38 UNION ALL SELECT 39 UNION ALL SELECT 40
+    //             ) n
+    //             WHERE n.n < t.duree_mois
+    //         ) prets ON mois.mois = prets.mois_pret
+
+    //         LEFT JOIN (
+    //             SELECT 
+    //                 DATE_FORMAT(r.date_echeance, '%Y-%m') AS mois_remb,
+    //                 SUM((p.montant * t.taux_interet / 100) / t.duree_mois) AS interet_reel,
+    //                 COUNT(*) AS nb_remboursements,
+    //                 SUM(CASE WHEN r.date_paiement > r.date_echeance THEN 1 ELSE 0 END) AS nb_retards
+    //             FROM banque_remboursement r
+    //             JOIN banque_pret p ON r.id_pret = p.id
+    //             JOIN banque_type_pret t ON p.id_type_pret = t.id
+    //             WHERE r.date_echeance BETWEEN :debut AND :fin
+    //             GROUP BY mois_remb
+    //         ) remb ON mois.mois = remb.mois_remb
+
+    //         GROUP BY mois.mois
+    //         ORDER BY mois.mois ASC
+    //     ");
+
+    //     $stmt->execute([
+    //         ':debut' => $dateDebut,
+    //         ':fin' => $dateFin
+    //     ]);
+
+    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // }
+
+
+    public static function getInteretsPrevuReelParMois($dateDebut, $dateFin) {
+        $db = getDB();
+
+        $stmt = $db->prepare("
+            SELECT 
+                mois.mois,
+                IFNULL(SUM(prets.mensualite), 0) AS mensualite_vpm,
+                IFNULL(SUM(prets.interet_compose), 0) AS interet_prevu,
+                IFNULL(SUM(remb.interet_reel), 0) AS interet_reel,
+                IFNULL(SUM(remb.nb_remboursements), 0) AS nb_remboursements,
+                IFNULL(SUM(remb.nb_retards), 0) AS nb_retards
+            FROM (
+                SELECT DATE_FORMAT(DATE_ADD(:debut, INTERVAL n.n MONTH), '%Y-%m') AS mois
+                FROM (
+                    SELECT @rownum := @rownum + 1 AS n
+                    FROM (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                        UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
+                        UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d,
+                        (SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+                        UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
+                        UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) d2,
+                        (SELECT @rownum := 0) r
+                ) n
+                WHERE DATE_ADD(:debut, INTERVAL n.n MONTH) <= :fin
+            ) mois
+
+            LEFT JOIN (
+                SELECT 
+                    DATE_FORMAT(DATE_ADD(p.date_demande, INTERVAL n.n MONTH), '%Y-%m') AS mois_pret,
+                    -- mensualité VPM
+                    ((p.montant * ((t.taux_interet / 100) / 12)) /
+                    (1 - POW(1 + ((t.taux_interet / 100) / 12), -t.duree_mois))) AS mensualite,
+
+                    -- intérêt mensuel composé = mensualité - part capital
+                    (((p.montant * ((t.taux_interet / 100) / 12)) /
+                    (1 - POW(1 + ((t.taux_interet / 100) / 12), -t.duree_mois))) - (p.montant / t.duree_mois)) AS interet_compose
+
+                FROM banque_pret p
+                JOIN banque_type_pret t ON p.id_type_pret = t.id
+                JOIN (
+                    SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
+                    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 
+                    UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL SELECT 13 
+                    UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 17 
+                    UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL SELECT 20 UNION ALL SELECT 21 
+                    UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24 UNION ALL SELECT 25 
+                    UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28 UNION ALL SELECT 29 
+                    UNION ALL SELECT 30 UNION ALL SELECT 31 UNION ALL SELECT 32 UNION ALL SELECT 33 
+                    UNION ALL SELECT 34 UNION ALL SELECT 35 UNION ALL SELECT 36 UNION ALL SELECT 37 
+                    UNION ALL SELECT 38 UNION ALL SELECT 39 UNION ALL SELECT 40
+                ) n
+                WHERE n.n < t.duree_mois
+            ) prets ON mois.mois = prets.mois_pret
+
+            LEFT JOIN (
+                SELECT 
+                    DATE_FORMAT(r.date_echeance, '%Y-%m') AS mois_remb,
+                    SUM(r.montant - (p.montant / t.duree_mois)) AS interet_reel,
+                    COUNT(*) AS nb_remboursements,
+                    SUM(CASE WHEN r.date_paiement > r.date_echeance THEN 1 ELSE 0 END) AS nb_retards
+                FROM banque_remboursement r
+                JOIN banque_pret p ON r.id_pret = p.id
+                JOIN banque_type_pret t ON p.id_type_pret = t.id
+                WHERE r.date_echeance BETWEEN :debut AND :fin
+                GROUP BY mois_remb
+            ) remb ON mois.mois = remb.mois_remb
+
+            GROUP BY mois.mois
+            ORDER BY mois.mois ASC
+        ");
+
+        $stmt->execute([
+            ':debut' => $dateDebut,
+            ':fin' => $dateFin
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }

@@ -93,3 +93,6 @@ INSERT INTO banque_historique_pret (
   (1, 2, 'en attente', 'approuvé', '2025-07-07 10:30:00');
 
 COMMIT;
+
+-- INSERT INTO banque_pret (id_client, id_agent, id_type_pret, montant, date_demande, statut) VALUES
+-- (1, 1, 1, 150000000, '2025-01-15', 'valide');

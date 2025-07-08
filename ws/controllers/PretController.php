@@ -56,7 +56,7 @@ class PretController {
     public static function ajouterType() {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'])) {
+        if (!isset($data['nom'], $data['taux_interet'], $data['duree_mois'], $data['assurance_percent'])) {
             Flight::json(['success' => false, 'message' => 'Paramètres manquants.'], 400);
             return;
         }
@@ -64,18 +64,22 @@ class PretController {
         $nom = trim($data['nom']);
         $taux = floatval($data['taux_interet']);
         $duree = intval($data['duree_mois']);
+        $assurance = floatval($data['assurance']);
 
+        // Vérifie si un type de prêt similaire existe déjà
         $dejaExistant = Pret::existe($taux, $duree);
         if ($dejaExistant) {
             Flight::json(['success' => false, 'message' => 'Type de prêt similaire existe déjà.'], 409);
             return;
         }
 
-        $ok = Pret::ajouterType($nom, $taux, $duree);
+        // Ajout du type de prêt avec assurance
+        $ok = Pret::ajouterType($nom, $taux, $duree, $assurance);
         if ($ok) {
             Flight::json(['success' => true, 'message' => 'Type de prêt ajouté avec succès.']);
         } else {
             Flight::json(['success' => false, 'message' => 'Erreur lors de l\'ajout.'], 500);
         }
     }
+
 }

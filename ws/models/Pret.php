@@ -120,9 +120,9 @@ public static function byClient(int $idClient): array {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function ajouterType($nom, $taux, $duree) {
+    public static function ajouterType($nom, $taux, $duree, $assurance) {
         $db = getDB();
-        $stmt = $db->prepare("INSERT INTO banque_type_pret (nom, taux_interet, duree_mois) VALUES (?, ?, ?)");
-        return $stmt->execute([$nom, $taux, $duree]);
+        $stmt = $db->prepare("INSERT INTO banque_type_pret (nom, taux_interet, duree_mois, assurance) VALUES (?, ?, ?, ?)");
+        return $stmt->execute([$nom, $taux, $duree, $assurance]);
     }
 }

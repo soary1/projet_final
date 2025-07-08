@@ -351,6 +351,9 @@
       <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
       <a href="#" class="active"><i class="bi bi-wallet2"></i> Ajouter Fond</a>
       <a href="liste_prets.html" class="active"><i class="bi bi-plus-circle"></i> Faire remboursement</a>
+                  <a href="disponibilites.html" ><i class="bi bi-calendar3"></i> Disponibilités</a>
+      <a href="../admin/pret-retarder/ajouter_type_pret.html"><i class="bi bi-card-list"></i> Ajouter type</a>
+
       <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
     </nav>
   </div>

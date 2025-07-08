@@ -3,130 +3,562 @@
 <head>
   <meta charset="UTF-8">
   <title>Créer un Type de Prêt</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      --dark-bg: #0f1419;
+      --card-bg: #1a1f2e;
+      --sidebar-bg: #161b22;
+      --text-primary: #ffffff;
+      --text-secondary: #8b949e;
+      --border-color: #30363d;
+      --hover-bg: #21262d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 20px;
-      border-radius: 10px;
-      background: #f7f7f7;
-      box-shadow: 0 0 10px #ccc;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    h1 {
-      text-align: center;
+    .sidebar {
+      height: 100vh;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(10px);
+      padding: 2rem 0;
+      position: fixed;
+      width: 280px;
+      border-right: 1px solid var(--border-color);
+      z-index: 1000;
     }
 
-    label {
-      margin-top: 10px;
-      display: block;
-      font-weight: bold;
+    .sidebar-header {
+      padding: 0 2rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
     }
 
-    input, button {
+    .sidebar-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-nav {
+      padding: 0 1rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-nav a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
+      height: 100%;
+      background: var(--primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
     }
 
-    button {
-      background-color: #4CAF50;
-      color: white;
+    .sidebar-nav a:hover {
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+
+    .sidebar-nav a:hover::before {
+      opacity: 0.1;
+    }
+
+    .sidebar-nav a.active {
+      color: var(--text-primary);
+      background: var(--hover-bg);
+      border-left: 3px solid #667eea;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      padding: 2rem;
+      min-height: 100vh;
+      background: var(--dark-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-header .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .form-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary-gradient);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group label i {
+      color: #667eea;
+    }
+
+    .form-control-modern {
+      width: 100%;
+      background: var(--hover-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .form-control-modern:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-control-modern::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
       border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      width: 100%;
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .message {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: 500;
       text-align: center;
-      font-weight: bold;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(-10px);
     }
 
-    .ok {
-      color: green;
+    .message.show {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .error {
-      color: red;
+    .message.success {
+      background: rgba(79, 172, 254, 0.1);
+      border: 1px solid rgba(79, 172, 254, 0.3);
+      color: #4facfe;
+    }
+
+    .message.error {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      color: #ff6b6b;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--border-color);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group .form-control-modern {
+      padding-right: 3rem;
+    }
+
+    .input-suffix {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="bi bi-graph-up"></i> EF Mada</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts</a>
+      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Remboursement</a>
+      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Export pdf</a>
+      <a href="prets-attente.html"><i class="bi bi-clock-history"></i> Prêts en attente</a>
+      <a href="fond.php"><i class="bi bi-piggy-bank"></i> Ajouter un fond</a>
+      <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
+      <a href="interet.php"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="interets_par_mois.php"><i class="bi bi-bar-chart"></i> Intérêts Gagné Par mois</a>
+      <a href="disponibilites.html"><i class="bi bi-calendar3"></i> Disponibilités</a>
+      <a href="create_loan_type.php" class="active"><i class="bi bi-plus-circle"></i> Créer Type de Prêt</a>
+      <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+    </nav>
+  </div>
 
-  <h1>Ajouter un Type de Prêt</h1>
+  <div class="main-content">
+    <div class="page-header">
+      <div class="icon">
+        <i class="bi bi-plus-circle-fill" style="font-size: 1.5rem; color: #667eea;"></i>
+      </div>
+      <div>
+        <h1>Créer un Type de Prêt</h1>
+        <p class="subtitle">Définir les paramètres d'un nouveau type de prêt</p>
+      </div>
+    </div>
 
-  <label for="nom">Nom du prêt</label>
-  <input type="text" id="nom" placeholder="ex: Crédit Immo" required>
+    <div class="form-container">
+      <form id="loanTypeForm">
+        <div class="form-group">
+          <label for="nom">
+            <i class="bi bi-tag"></i>
+            Nom du prêt
+          </label>
+          <input type="text" id="nom" class="form-control-modern" placeholder="ex: Crédit Immobilier" required>
+        </div>
 
-  <label for="taux">Taux d’intérêt (%)</label>
-  <input type="number" id="taux" placeholder="ex: 5.5" step="0.01" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taux">
+              <i class="bi bi-percent"></i>
+              Taux d'intérêt
+            </label>
+            <div class="input-group">
+              <input type="number" id="taux" class="form-control-modern" placeholder="ex: 5.5" step="0.01" min="0" max="100" required>
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
 
-  <label for="duree">Durée (en mois)</label>
-  <input type="number" id="duree" placeholder="ex: 60" required>
+          <div class="form-group">
+            <label for="duree">
+              <i class="bi bi-calendar-month"></i>
+              Durée
+            </label>
+            <div class="input-group">
+              <input type="number" id="duree" class="form-control-modern" placeholder="ex: 60" min="1" max="600" required>
+              <span class="input-suffix">mois</span>
+            </div>
+          </div>
+        </div>
 
-  <label for="delai">Délai avant 1er remboursement (mois)</label>
-  <input type="number" id="delai" placeholder="ex: 3" min="0" value="0">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="delai">
+              <i class="bi bi-clock"></i>
+              Délai avant 1er remboursement
+            </label>
+            <div class="input-group">
+              <input type="number" id="delai" class="form-control-modern" placeholder="ex: 3" min="0" max="12" value="0">
+              <span class="input-suffix">mois</span>
+            </div>
+          </div>
 
-  <label for="assurance">Valeur Assurance</label>
-  <input type="number" id="assurance" placeholder="ex: 3" min="0" value="0">
+          <div class="form-group">
+            <label for="assurance">
+              <i class="bi bi-shield-check"></i>
+              Valeur Assurance
+            </label>
+            <div class="input-group">
+              <input type="number" id="assurance" class="form-control-modern" placeholder="ex: 3" min="0" max="100" value="0">
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+        </div>
 
-  <button onclick="ajouterTypePret()">Créer</button>
+        <div class="loading-spinner" id="loading">
+          <div class="spinner"></div>
+          <p>Création en cours...</p>
+        </div>
 
-  <div id="resultat" class="message"></div>
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <i class="bi bi-plus-circle"></i>
+          Créer le Type de Prêt
+        </button>
+
+        <div id="message" class="message"></div>
+      </form>
+    </div>
+  </div>
 
   <script>
     const api = "http://localhost/projet_final/ws";
 
-    function ajouterTypePret() {
-      const nom = document.getElementById("nom").value.trim();
-      const taux = parseFloat(document.getElementById("taux").value);
-      const duree = parseInt(document.getElementById("duree").value);
-      const delai = parseInt(document.getElementById("delai").value);
-      const assurance = parseInt(document.getElementById("assurance").value);
+    function showLoading() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('submitBtn').disabled = true;
+    }
 
-      if (!nom || isNaN(taux) || isNaN(duree)) {
-        afficher("Veuillez remplir tous les champs requis", true);
+    function hideLoading() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    function showMessage(text, isError = false) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${isError ? 'error' : 'success'} show`;
+      
+      setTimeout(() => {
+        messageDiv.classList.remove('show');
+      }, 5000);
+    }
+
+    function resetForm() {
+      document.getElementById('loanTypeForm').reset();
+      document.getElementById('delai').value = '0';
+      document.getElementById('assurance').value = '0';
+    }
+
+    function validateForm() {
+      const nom = document.getElementById('nom').value.trim();
+      const taux = parseFloat(document.getElementById('taux').value);
+      const duree = parseInt(document.getElementById('duree').value);
+      const delai = parseInt(document.getElementById('delai').value);
+      const assurance = parseFloat(document.getElementById('assurance').value);
+
+      if (!nom) {
+        showMessage('Le nom du prêt est requis', true);
+        return false;
+      }
+
+      if (isNaN(taux) || taux < 0 || taux > 100) {
+        showMessage('Le taux d\'intérêt doit être entre 0 et 100%', true);
+        return false;
+      }
+
+      if (isNaN(duree) || duree < 1) {
+        showMessage('La durée doit être au moins 1 mois', true);
+        return false;
+      }
+
+      if (isNaN(delai) || delai < 0) {
+        showMessage('Le délai ne peut pas être négatif', true);
+        return false;
+      }
+
+      if (isNaN(assurance) || assurance < 0 || assurance > 100) {
+        showMessage('La valeur d\'assurance doit être entre 0 et 100%', true);
+        return false;
+      }
+
+      return true;
+    }
+
+    document.getElementById('loanTypeForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!validateForm()) {
         return;
       }
 
+      showLoading();
+
       const data = {
-        nom: nom,
-        taux_interet: taux,
-        duree_mois: duree,
-        delai_defaut: delai,
-        assurance: assurance
+        nom: document.getElementById('nom').value.trim(),
+        taux_interet: parseFloat(document.getElementById('taux').value),
+        duree_mois: parseInt(document.getElementById('duree').value),
+        delai_defaut: parseInt(document.getElementById('delai').value),
+        assurance: parseFloat(document.getElementById('assurance').value)
       };
 
       fetch(`${api}/typepret`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data)
       })
-      .then(res => res.json())
-      .then(res => {
-        if (res.id) {
-          afficher("✅ Type de prêt créé avec succès !", false);
-          document.getElementById("nom").value = "";
-          document.getElementById("taux").value = "";
-          document.getElementById("duree").value = "";
-          document.getElementById("delai").value = "0";
+      .then(response => response.json())
+      .then(result => {
+        hideLoading();
+        
+        if (result.id) {
+          showMessage('✅ Type de prêt créé avec succès !', false);
+          resetForm();
         } else {
-          afficher(res.error || "Erreur inconnue lors de la création", true);
+          showMessage(result.error || 'Erreur lors de la création du type de prêt', true);
         }
       })
-      .catch(err => {
-        console.error(err);
-        afficher("Erreur réseau ou serveur", true);
+      .catch(error => {
+        hideLoading();
+        console.error('Erreur:', error);
+        showMessage('Erreur de connexion au serveur', true);
+      });
+    });
+
+    // Animation des inputs
+    document.querySelectorAll('.form-control-modern').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+      });
+    });
+
+    function logout() {
+      fetch("http://localhost/projet_final/ws/logout", {
+        method: "POST"
+      })
+      .then(() => {
+        window.location.href = "../../index.html";
+      })
+      .catch(() => {
+        window.location.href = "../../index.html";
       });
     }
-
-    function afficher(message, isError = false) {
-      const div = document.getElementById("resultat");
-      div.className = "message " + (isError ? "error" : "ok");
-      div.textContent = message;
-    }
   </script>
-
 </body>
 </html>

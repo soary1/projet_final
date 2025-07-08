@@ -1,164 +1,752 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Disponibilités Mensuelles - EF Mada</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .glass {
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      --dark-bg: #0f1419;
+      --card-bg: #1a1f2e;
+      --sidebar-bg: #161b22;
+      --text-primary: #ffffff;
+      --text-secondary: #8b949e;
+      --border-color: #30363d;
+      --hover-bg: #21262d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background: var(--sidebar-bg);
       backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem 0;
+      position: fixed;
+      width: 280px;
+      border-right: 1px solid var(--border-color);
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 0 2rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-nav {
+      padding: 0 1rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-nav a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .sidebar-nav a:hover {
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+
+    .sidebar-nav a:hover::before {
+      opacity: 0.1;
+    }
+
+    .sidebar-nav a.active {
+      color: var(--text-primary);
+      background: var(--hover-bg);
+      border-left: 3px solid #667eea;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      padding: 2rem;
+      min-height: 100vh;
+      background: var(--dark-bg);
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-header .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .card-modern {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary-gradient);
+    }
+
+    .filter-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-control-modern {
+      background: var(--hover-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .form-control-modern:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-search {
+      background: var(--primary-gradient);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .btn-search:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary-gradient);
+    }
+
+    .stat-card.success::before {
+      background: var(--success-gradient);
+    }
+
+    .stat-card.warning::before {
+      background: var(--warning-gradient);
+    }
+
+    .stat-card.secondary::before {
+      background: var(--secondary-gradient);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+    }
+
+    .table-modern {
+      width: 100%;
+      background: transparent;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .table-modern thead {
+      background: var(--hover-bg);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-modern th {
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      border: none;
+    }
+
+    .table-modern td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+      border-left: none;
+      border-right: none;
+    }
+
+    .table-modern tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    .table-modern tbody tr:hover {
+      background: var(--hover-bg);
+    }
+
+    .table-modern tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .amount-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .amount-fonds {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+
+    .amount-empruntes {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+    }
+
+    .amount-remboursements {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
+
+    .amount-disponible {
+      background: rgba(139, 92, 246, 0.1);
+      color: #8b5cf6;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .chart-header .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      
+      .filter-form {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
-<body class="flex bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen">
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="bi bi-graph-up"></i> EF Mada</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts</a>
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Remboursement</a>
+      <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Export pdf</a>
+      <a href="pres/prets-attente.html"><i class="bi bi-clock-history"></i> Prêts en attente</a>
+      <a href="fond.php"><i class="bi bi-piggy-bank"></i> Ajouter un fond</a>
+      <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
+      <a href="interet.php"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="interets_par_mois.php"><i class="bi bi-bar-chart"></i> Intérêts Gagné Par mois</a>
+      <a href="disponibilites.html" class="active"><i class="bi bi-calendar3"></i> Disponibilités</a>
+      <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+    </nav>
+  </div>
 
-  <!-- Sidebar -->
-  <aside class="w-64 p-6 bg-[#1e2a56] text-white flex flex-col space-y-4">
-    <h2 class="text-2xl font-bold text-blue-300 mb-6">EF Mada</h2>
-    <a href="pres/liste_prets.html" class="flex items-center gap-2 hover:bg-blue-800 p-2 rounded-md"><i class="bi bi-list"></i> Voir les prêts</a>
-    <a href="pres/prets-attente.html" class="flex items-center gap-2 hover:bg-blue-800 p-2 rounded-md"><i class="bi bi-hourglass-split"></i> Prêts en attente</a>
-    <a href="fond.php" class="flex items-center gap-2 hover:bg-blue-800 p-2 rounded-md"><i class="bi bi-cash-stack"></i> Ajouter un fond</a>
-    <a href="simulation.php" class="flex items-center gap-2 hover:bg-blue-800 p-2 rounded-md"><i class="bi bi-calculator"></i> Simulation Prêt</a>
-    <a href="interet.php" class="flex items-center gap-2 hover:bg-blue-800 p-2 rounded-md"><i class="bi bi-bar-chart"></i> Intérêt</a>
-    <a href="disponibilites.html" class="flex items-center gap-2 bg-blue-800 p-2 rounded-md"><i class="bi bi-calendar3"></i> Disponibilités</a>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="flex-1 p-10">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Disponibilité mensuelle de l'établissement</h1>
-
-    <form id="filtre-form" class="glass rounded-xl p-6 shadow-md mb-6 flex gap-4 items-end">
-      <div>
-        <label for="debut" class="block text-sm font-medium text-gray-700">Mois de début</label>
-        <input type="month" id="debut" name="debut" class="mt-1 p-2 border rounded-md w-full" required />
+  <div class="main-content">
+    <div class="page-header">
+      <div class="icon">
+        <i class="bi bi-calendar3" style="font-size: 1.5rem;"></i>
       </div>
       <div>
-        <label for="fin" class="block text-sm font-medium text-gray-700">Mois de fin</label>
-        <input type="month" id="fin" name="fin" class="mt-1 p-2 border rounded-md w-full" required />
+        <h1>Disponibilités Mensuelles</h1>
+        <p class="subtitle">Suivi des fonds disponibles de l'établissement</p>
       </div>
-      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Filtrer</button>
-    </form>
-
-    <div class="glass p-6 rounded-2xl shadow-lg">
-      <table class="w-full text-center text-sm text-gray-700">
-        <thead class="bg-white bg-opacity-50 font-semibold text-gray-800">
-          <tr>
-            <th class="py-3">Mois</th>
-            <th class="py-3">Fonds reçus</th>
-            <th class="py-3">Montants empruntés</th>
-            <th class="py-3">Remboursements</th>
-            <th class="py-3">Disponible</th>
-          </tr>
-        </thead>
-        <tbody id="table-body" class="bg-white bg-opacity-40">
-          <!-- Data insérée ici -->
-        </tbody>
-      </table>
     </div>
 
-    <div class="glass p-6 mt-8 rounded-2xl shadow-lg">
-      <canvas id="dispoChart" height="100"></canvas>
+    <div class="stats-grid" id="stats-grid">
+      <!-- Stats will be populated by JavaScript -->
     </div>
-  </main>
+
+    <div class="card-modern">
+      <div class="chart-header">
+        <div class="icon">
+          <i class="bi bi-funnel"></i>
+        </div>
+        <h3>Filtres de recherche</h3>
+      </div>
+      <form id="filtre-form" class="filter-form">
+        <div class="form-group">
+          <label>Mois de début</label>
+          <input type="month" id="debut" name="debut" class="form-control-modern" required />
+        </div>
+        <div class="form-group">
+          <label>Mois de fin</label>
+          <input type="month" id="fin" name="fin" class="form-control-modern" required />
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn-search">
+            <i class="bi bi-search"></i> Filtrer
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card-modern">
+      <div class="chart-header">
+        <div class="icon">
+          <i class="bi bi-table"></i>
+        </div>
+        <h3>Détails mensuels</h3>
+      </div>
+      <div class="loading-spinner" id="loading">
+        <div class="spinner"></div>
+        <p>Chargement des données...</p>
+      </div>
+      <div class="table-container" id="table-container">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Mois</th>
+              <th>Fonds reçus</th>
+              <th>Montants empruntés</th>
+              <th>Remboursements</th>
+              <th>Disponible</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Data will be populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <i class="bi bi-inbox"></i>
+        <h3>Aucune donnée disponible</h3>
+        <p>Essayez de modifier vos filtres de recherche</p>
+      </div>
+    </div>
+
+    <div class="card-modern">
+      <div class="chart-header">
+        <div class="icon">
+          <i class="bi bi-bar-chart-line"></i>
+        </div>
+        <h3>Évolution des disponibilités</h3>
+      </div>
+      <div class="chart-container">
+        <canvas id="dispoChart"></canvas>
+      </div>
+    </div>
+  </div>
 
   <script>
-  const apiBase = "http://localhost/projet_final/ws";
+    const apiBase = "http://localhost/projet_final/ws";
+    const form = document.getElementById("filtre-form");
+    const tableBody = document.getElementById("table-body");
+    const ctx = document.getElementById("dispoChart").getContext("2d");
+    let chart;
 
-  const form = document.getElementById("filtre-form");
-  const tableBody = document.getElementById("table-body");
-  const ctx = document.getElementById("dispoChart").getContext("2d");
-  let chart;
+    function showLoading() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('table-container').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'none';
+    }
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const debut = document.getElementById("debut").value;
-    const fin = document.getElementById("fin").value;
+    function hideLoading() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('table-container').style.display = 'block';
+    }
 
-    if (!debut || !fin) return;
+    function updateStats(data) {
+      const statsGrid = document.getElementById('stats-grid');
+      let totalFonds = data.reduce((sum, item) => sum + item.fonds, 0);
+      let totalEmpruntes = data.reduce((sum, item) => sum + item.montants_empruntes, 0);
+      let totalRemboursements = data.reduce((sum, item) => sum + item.remboursements, 0);
+      let moyenneDisponible = data.length > 0 ? data.reduce((sum, item) => sum + item.disponible, 0) / data.length : 0;
 
-    fetch(`${apiBase}/disponibilites?debut=${debut}&fin=${fin}`)
-      .then(res => res.json())
-      .then(data => {
-        tableBody.innerHTML = "";
-        const labels = [];
-        const fonds = [];
-        const empruntes = [];
-        const remboursements = [];
-        const disponibles = [];
+      statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${totalFonds.toLocaleString()} Ar</div>
+          <div class="stat-label">Total fonds reçus</div>
+        </div>
+        <div class="stat-card secondary">
+          <div class="stat-value">${totalEmpruntes.toLocaleString()} Ar</div>
+          <div class="stat-label">Total emprunts</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-value">${totalRemboursements.toLocaleString()} Ar</div>
+          <div class="stat-label">Total remboursements</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value">${moyenneDisponible.toLocaleString()} Ar</div>
+          <div class="stat-label">Disponibilité moyenne</div>
+        </div>
+      `;
+    }
 
-        data.forEach(item => {
-          labels.push(item.mois);
-          fonds.push(item.fonds);
-          empruntes.push(item.montants_empruntes);
-          remboursements.push(item.remboursements);
-          disponibles.push(item.disponible);
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showLoading();
+      
+      const debut = document.getElementById("debut").value;
+      const fin = document.getElementById("fin").value;
 
-          const row = `<tr>
-            <td class="py-2">${item.mois}</td>
-            <td class="py-2">${item.fonds.toLocaleString()} Ar</td>
-            <td class="py-2">${item.montants_empruntes.toLocaleString()} Ar</td>
-            <td class="py-2">${item.remboursements.toLocaleString()} Ar</td>
-            <td class="py-2 font-semibold">${item.disponible.toLocaleString()} Ar</td>
-          </tr>`;
-          tableBody.innerHTML += row;
-        });
+      if (!debut || !fin) {
+        hideLoading();
+        return;
+      }
 
-        // Rafraîchir le graphique
-        if (chart) chart.destroy();
-        chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: 'Fonds disponibles',
-                data: fonds,
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                tension: 0.4
-              },
-              {
-                label: 'Montants empruntés',
-                data: empruntes,
-                borderColor: '#ef4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                tension: 0.4
-              },
-              {
-                label: 'Remboursements',
-                data: remboursements,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                tension: 0.4
-              },
-              {
-                label: 'Disponibilité finale',
-                data: disponibles,
-                borderColor: '#8b5cf6',
-                backgroundColor: 'rgba(139, 92, 246, 0.2)',
-                tension: 0.4
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: 'top' },
-              tooltip: { mode: 'index', intersect: false }
-            },
-            scales: {
-              y: { beginAtZero: true }
-            }
+      fetch(`${apiBase}/disponibilites?debut=${debut}&fin=${fin}`)
+        .then(res => res.json())
+        .then(data => {
+          hideLoading();
+          
+          if (data.length === 0) {
+            document.getElementById('empty-state').style.display = 'block';
+            document.getElementById('table-container').style.display = 'none';
+            return;
           }
+
+          updateStats(data);
+          
+          tableBody.innerHTML = "";
+          const labels = [];
+          const fonds = [];
+          const empruntes = [];
+          const remboursements = [];
+          const disponibles = [];
+
+          data.forEach(item => {
+            labels.push(item.mois);
+            fonds.push(item.fonds);
+            empruntes.push(item.montants_empruntes);
+            remboursements.push(item.remboursements);
+            disponibles.push(item.disponible);
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td><strong>${item.mois}</strong></td>
+              <td><span class="amount-badge amount-fonds">${item.fonds.toLocaleString()} Ar</span></td>
+              <td><span class="amount-badge amount-empruntes">${item.montants_empruntes.toLocaleString()} Ar</span></td>
+              <td><span class="amount-badge amount-remboursements">${item.remboursements.toLocaleString()} Ar</span></td>
+              <td><span class="amount-badge amount-disponible">${item.disponible.toLocaleString()} Ar</span></td>
+            `;
+            tableBody.appendChild(row);
+          });
+
+          // Refresh chart
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: 'Fonds reçus',
+                  data: fonds,
+                  borderColor: '#667eea',
+                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#667eea',
+                  pointBorderColor: '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5
+                },
+                {
+                  label: 'Montants empruntés',
+                  data: empruntes,
+                  borderColor: '#ff6b6b',
+                  backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#ff6b6b',
+                  pointBorderColor: '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5
+                },
+                {
+                  label: 'Remboursements',
+                  data: remboursements,
+                  borderColor: '#10b981',
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#10b981',
+                  pointBorderColor: '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5
+                },
+                {
+                  label: 'Disponibilité finale',
+                  data: disponibles,
+                  borderColor: '#8b5cf6',
+                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#8b5cf6',
+                  pointBorderColor: '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  labels: {
+                    color: '#8b949e',
+                    font: {
+                      size: 12,
+                      weight: 500
+                    }
+                  }
+                },
+                tooltip: { 
+                  mode: 'index', 
+                  intersect: false,
+                  backgroundColor: 'rgba(26, 31, 46, 0.9)',
+                  titleColor: '#ffffff',
+                  bodyColor: '#8b949e',
+                  borderColor: '#30363d',
+                  borderWidth: 1
+                }
+              },
+              scales: {
+                y: { 
+                  beginAtZero: true,
+                  ticks: {
+                    color: '#8b949e'
+                  },
+                  grid: {
+                    color: '#30363d'
+                  }
+                },
+                x: {
+                  ticks: {
+                    color: '#8b949e'
+                  },
+                  grid: {
+                    color: '#30363d'
+                  }
+                }
+              }
+            }
+          });
+        })
+        .catch(error => {
+          hideLoading();
+          console.error('Erreur:', error);
+          document.getElementById('empty-state').style.display = 'block';
+          document.getElementById('table-container').style.display = 'none';
         });
+    });
+
+    function logout() {
+      fetch("http://localhost/projet_final/ws/logout", {
+        method: "POST"
+      })
+      .then(() => {
+        window.location.href = "../../index.html";
+      })
+      .catch(() => {
+        window.location.href = "../../index.html";
       });
-  });
-</script>
-
-
+    }
+  </script>
 </body>
 </html>

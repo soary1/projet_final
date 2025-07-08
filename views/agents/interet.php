@@ -465,6 +465,7 @@
     </div>
     <nav class="sidebar-nav">
       <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts</a>
+      <a href="../admin/pret-retarder/ajouter_type_pret.html"><i class="bi bi-card-list"></i> Ajouter type</a>
       <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Remboursement</a>
       <a href="pres/liste_prets.html"><i class="bi bi-card-list"></i> Export pdf</a>
       <a href="pres/prets-attente.html"><i class="bi bi-clock-history"></i> Prêts en attente</a>
@@ -472,6 +473,8 @@
       <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
       <a href="interet.php" class="active"><i class="bi bi-bar-chart"></i> Intérêts</a>
       <a href="interets_par_mois.php" class="bi bi-calculator"><i class="bi bi-bar-chart"></i> Intérêts Gagné Par mois</a>
+            <a href="disponibilites.html" ><i class="bi bi-calendar3"></i> Disponibilités</a>
+
       <!-- <a href="pres/liste_prets.html"><i class="bi bi-people"></i> Prêt Client</a> -->
       <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
     </nav>

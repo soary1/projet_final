@@ -767,7 +767,7 @@
     function updateStats() {
       const totalPrets = pretsData.length;
       const montantTotal = pretsData.reduce((sum, p) => sum + parseFloat(p.montant || 0), 0);
-      const enAttente = pretsData.filter(p => p.statut === 'en_attente' || !p.statut).length;
+      const enAttente = pretsData.filter(p => p.statut === 'en attente' || !p.statut).length;
       const valides = pretsData.filter(p => p.statut === 'valide').length;
 
       document.getElementById('stat-total-prets').textContent = totalPrets;
@@ -818,7 +818,7 @@
             <td>${p.email || 'N/A'}</td>
             <td>${p.nom_type_pret || p.type_pret || 'N/A'}</td>
             <td><span class="amount-badge">${formatAr(p.montant)} Ar</span></td>
-            <td>${getStatusBadge(p.statut || 'en_attente')}</td>
+            <td>${getStatusBadge(p.statut || 'en attente')}</td>
             <td>${new Date(p.date_demande).toLocaleDateString()}</td>
             <td>
               <div class="btn-actions">

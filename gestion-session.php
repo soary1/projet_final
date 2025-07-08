@@ -17,13 +17,10 @@ $_SESSION['user']['profession'] = $_POST['profession'] ?? null;
 // Redirection selon le rôle
 switch ($_SESSION['user']['role']) {
   case 'admin':
-    header('Location: views/admin/accueil.php');
+    header('Location: views/admin/accueil.html');
     break;
   case 'agent':
-    header('Location: views/agents/accueil.html');
-    break;
-  case 'client':
-    header('Location: views/client/accueil.html');
+    header('Location: views/agents/interet.php');
     break;
   default:
     header('Location: login.php?erreur=Rôle inconnu');

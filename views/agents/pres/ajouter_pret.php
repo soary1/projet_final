@@ -434,12 +434,14 @@ session_start();
       <h2><i class="bi bi-graph-up"></i> EF Mada</h2>
     </div>
     <nav class="sidebar-nav">
-      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts a rembourser</a>
+      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Voir les prêts</a>
+      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Remboursement</a>
+      <a href="liste_prets.html"><i class="bi bi-card-list"></i> Export Pdf</a>
       <a href="prets-attente.html"><i class="bi bi-clock-history"></i> Prêts en attente</a>
-      <a href="fond.php"><i class="bi bi-piggy-bank"></i> Ajouter un fond</a>
-      <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
-      <a href="interet.php"><i class="bi bi-bar-chart"></i> Intérêts</a>
-      <a href="interets_par_mois.php" class="bi bi-calculator"><i class="bi bi-bar-chart"></i> Intérêts Gagné Par mois</a>
+      <a href="../fond.php"><i class="bi bi-piggy-bank"></i> Ajouter un fond</a>
+      <a href="../simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
+      <a href="../interet.php"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="../interets_par_mois.php" class="bi bi-calculator"><i class="bi bi-bar-chart"></i> Intérêts Gagné Par mois</a>
       <a href="#" class="active"><i class="bi bi-plus-circle"></i> Ajouter un Prêt</a>
       <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
     </nav>

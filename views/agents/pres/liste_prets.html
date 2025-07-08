@@ -885,7 +885,7 @@ function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
           const taux_annuel = parseFloat(typeData.taux_interet);
           const duree_mois = parseInt(typeData.duree_mois);
           const assurance_taux = parseFloat(typeData.assurance || 0); // % assurance facultative
-const mensualite_assurance = montant * (assurance_taux / 100);
+          const mensualite_assurance = montant * (assurance_taux / 100);
           const nom = typeData.nom;
           const taux_mensuel = taux_annuel / 100 / 12;
 

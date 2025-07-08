@@ -53,11 +53,6 @@ public static function getAllPrets(): void
         Flight::json(null, 204);
     }
 
-    public static function getAllPrets(): void
-    {
-        Flight::json(Pret::allWithTypePret()); 
-    }
-
 
     public static function ajouterType() {
         $data = json_decode(file_get_contents("php://input"), true);

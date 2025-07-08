@@ -1,13 +1,12 @@
 <?php
 session_start();
 
-// Vérifie si l'utilisateur connecté est un agent
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: /projet_final/views/agents/login.php");
-//     exit;
-// }
+if (!isset($_SESSION['user_id'])) {
+    header("Location: /projet_final/views/agents/login.php");
+    exit;
+}
 
-$id_agent = $_SESSION['user_id'];
+$id_agent = $_SESSION['user'];
 ?>
 
 <!DOCTYPE html>

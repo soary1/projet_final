@@ -2,67 +2,161 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Les Prêts</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>Prêts en attente - EF Mada</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    button { padding: 5px 10px; }
-    select { margin-bottom: 10px; padding: 5px; }
+    body {
+      display: flex;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f6fa;
+    }
+
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      background-color: #1e2a56;
+      padding: 30px 20px;
+      color: white;
+    }
+
+    .sidebar h2 {
+      color: #8fb1ff;
+      font-weight: bold;
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #2c3e70;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background-color: #f0f2f5;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    td {
+      padding: 12px;
+      text-align: center;
+      background-color: #fff;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .btn {
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 14px;
+    }
+
+    .btn-success {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Les Prêts</h1>
-  <a href="ajouter_pret.html">➕ Ajouter un prêt</a>
-
-  <div>
-    <label for="filtre-client">Filtrer par client :</label>
-    <select id="filtre-client" onchange="filtrerParClient()">
-      <option value="">-- Tous les clients --</option>
-    </select>
+  <div class="sidebar">
+    <h2>EF Mada</h2>
+    <a href="pres/liste_prets.html"><i class="bi bi-list"></i> Voir les prêts</a>
+    <a href="pres/prets-attente.html"><i class="bi bi-hourglass-split"></i> Voir les prêts en attente</a>
+    <a href="fond.php"><i class="bi bi-cash-stack"></i> Ajouter un fond</a>
+    <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
+    <a href="interet.php"><i class="bi bi-bar-chart"></i> Intérêt</a>
+    <a href="pres/liste_prets.html"><i class="bi bi-person-lines-fill"></i> Prêt Client</a>
   </div>
 
-  <table id="table-prets">
-    <thead>
-      <tr>
-        <th>ID</th><th>Client</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="main-content">
+    <h1>Liste des prêts en attente</h1>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Email</th>
+            <th>Type de prêt</th>
+            <th>Montant</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-prets">
+          <!-- Données JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
 
   <script>
     const apiBase = "http://localhost/projet_final/ws";
 
-    function ajax(method, url, data, callback) {
-      const xhr = new XMLHttpRequest();
-      xhr.open(method, apiBase + url, true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          callback(JSON.parse(xhr.responseText));
-        }
-      };
-      xhr.send(data);
-    }
-
-    function formatAr(n) {
-      return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    }
-
-    function chargerClients() {
-      ajax("GET", "/clients", null, (data) => {
-        const select = document.getElementById("filtre-client");
-        data.forEach(client => {
-          const option = document.createElement("option");
-          option.value = client.id;
-          option.textContent = client.nom_utilisateur;
-          select.appendChild(option);
+    function chargerPrets() {
+      fetch(apiBase + "/prets/en-attente")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("table-prets");
+          tbody.innerHTML = "";
+          data.forEach(p => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${p.nom_client}</td>
+              <td>${p.email}</td>
+              <td>${p.type_pret}</td>
+              <td>${p.montant} Ar</td>
+              <td>${new Date(p.date_demande).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-success" onclick="validerPret(${p.id})">Valider</button>
+                <button class="btn btn-danger" onclick="refuserPret(${p.id})">Refuser</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
         });
-      });
     }
 
 function chargerPrets(idClient = "") {
@@ -264,7 +358,6 @@ function validerRemboursementNmois() {
 
 
 
-    chargerClients();
     chargerPrets();
   </script>
   <div id="form-remboursement" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">

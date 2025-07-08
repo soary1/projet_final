@@ -19,3 +19,7 @@ INSERT INTO banque_pret (id_client, id_agent, id_type_pret, montant, date_demand
 (1, 1, 3, 8000000,   '2026-01-03', 'valide'),
 (1, 1, 4, 9500000,   '2026-02-17', 'valide'),
 (1, 1, 1, 180000000, '2026-03-30', 'valide');
+INSERT INTO banque_pret (id_client, id_agent, id_type_pret, montant, date_demande, statut) VALUES
+(1, 1, 3, 8000000,   '2027-01-03', 'en attente'),
+(1, 1, 4, 9500000,   '2027-02-17', 'en attente'),
+(1, 1, 1, 180000000, '2027-03-30', 'en attente');

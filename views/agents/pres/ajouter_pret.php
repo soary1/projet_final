@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// ⚠️ Sécurité : redirige si l'agent n'est pas connecté
-if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'agent') {
-    header("Location: /projet_final/views/agents/login.php");
-    exit;
-}
+// // ⚠️ Sécurité : redirige si l'agent n'est pas connecté
+// if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'agent') {
+//     header("Location: /projet_final/views/agents/login.php");
+//     exit;
+// }
 
-$id_agent = $_SESSION['id'];
+// $id_agent = $_SESSION['id'];
 ?>
 
 <!DOCTYPE html>
@@ -547,7 +547,9 @@ $id_agent = $_SESSION['id'];
 
   <script>
     const apiBase = "http://localhost/projet_final/ws";
-    const idAgent = <?= json_encode($id_agent) ?>;
+    
+    const idAgent = 1;
+
 
     function showAlert(message, type = 'success') {
       const alert = document.getElementById('alert-message');
@@ -636,47 +638,62 @@ $id_agent = $_SESSION['id'];
       });
     }
 
-    function ajouterPret() {
-      const id_client = document.getElementById("id_client").value;
-      const id_type_pret = document.getElementById("id_type_pret").value;
-      const montant = document.getElementById("montant").value;
+   function ajouterPret() {
+  const id_client = document.getElementById("id_client").value;
+  const id_type_pret = document.getElementById("id_type_pret").value;
+  const montant = document.getElementById("montant").value;
 
-      if (!id_client || !id_type_pret || !montant) {
-        showAlert("Veuillez remplir tous les champs requis.", "error");
-        return;
+  if (!id_client || !id_type_pret || !montant) {
+    showAlert("Veuillez remplir tous les champs requis.", "error");
+    return;
+  }
+
+  if (parseFloat(montant) <= 0) {
+    showAlert("Le montant doit être supérieur à 0.", "error");
+    return;
+  }
+
+  showLoading();
+
+  const data = {
+    id_client: id_client,
+    id_agent: 1, // ou remplace par ta variable idAgent si elle est globale
+    id_type_pret: id_type_pret,
+    montant: montant
+  };
+
+  fetch(`${apiBase}/prets/clients/${id_client}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+    .then(res => res.json())
+    .then(response => {
+      // hideLoading();
+
+      if (response.success || response.id || response.message) {
+        showAlert("Prêt soumis avec succès !", "success");
+
+        // Reset form
+        document.getElementById("id_client").value = "";
+        document.getElementById("id_type_pret").value = "";
+        document.getElementById("montant").value = "";
+
+        setTimeout(() => {
+          window.location.href = "liste_prets.html";
+        }, 2000);
+      } else {
+        showAlert(response.error || "Erreur lors de l'ajout du prêt", "error");
       }
+    })
+    .catch(err => {
+      console.error(err);
+      // hideLoading();
+      showAlert("Erreur réseau ou serveur", "error");
+    });
+}
 
-      if (parseFloat(montant) <= 0) {
-        showAlert("Le montant doit être supérieur à 0.", "error");
-        return;
-      }
-
-      showLoading();
-
-      const data = `id_client=${id_client}&id_agent=${idAgent}&id_type_pret=${id_type_pret}&montant=${montant}`;
-
-      ajax("POST", "/prets", data, (response) => {
-        hideLoading();
-        
-        if (response.success || response.message) {
-          showAlert("Prêt soumis avec succès !", "success");
-          
-          // Reset form
-          document.getElementById("id_client").value = "";
-          document.getElementById("id_type_pret").value = "";
-          document.getElementById("montant").value = "";
-          
-          // Optional: redirect after success
-          setTimeout(() => {
-            window.location.href = "liste_prets.html";
-          }, 2000);
-        } else {
-          showAlert("Erreur lors de l'ajout du prêt", "error");
-        }
-      });
-    }
-
-    // Form submission handler
+ // Form submission handler
     document.getElementById('loan-form').addEventListener('submit', function(e) {
       e.preventDefault();
       ajouterPret();

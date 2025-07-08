@@ -2,294 +2,863 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Prêts en attente - EF Mada</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Liste des Prêts - EF Mada</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    body {
-      display: flex;
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      --dark-bg: #0f1419;
+      --card-bg: #1a1f2e;
+      --sidebar-bg: #161b22;
+      --text-primary: #ffffff;
+      --text-secondary: #8b949e;
+      --border-color: #30363d;
+      --hover-bg: #21262d;
+      --success-color: #4facfe;
+      --warning-color: #fcb69f;
+      --error-color: #ff6b6b;
+    }
+
+    * {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f6fa;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
     .sidebar {
-      width: 220px;
       height: 100vh;
-      background-color: #1e2a56;
-      padding: 30px 20px;
-      color: white;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(10px);
+      padding: 2rem 0;
+      position: fixed;
+      width: 280px;
+      border-right: 1px solid var(--border-color);
+      z-index: 1000;
     }
 
-    .sidebar h2 {
-      color: #8fb1ff;
-      font-weight: bold;
-      font-size: 22px;
-      margin-bottom: 30px;
+    .sidebar-header {
+      padding: 0 2rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
     }
 
-    .sidebar a {
-      display: block;
-      color: white;
+    .sidebar-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-nav {
+      padding: 0 1rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text-secondary);
       text-decoration: none;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      transition: 0.3s;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
     }
 
-    .sidebar a:hover {
-      background-color: #2c3e70;
+    .sidebar-nav a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--primary-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .sidebar-nav a:hover {
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+
+    .sidebar-nav a:hover::before {
+      opacity: 0.1;
+    }
+
+    .sidebar-nav a.active {
+      color: var(--text-primary);
+      background: var(--hover-bg);
+      border-left: 3px solid #667eea;
     }
 
     .main-content {
-      flex: 1;
-      padding: 40px;
+      margin-left: 280px;
+      padding: 2rem;
+      min-height: 100vh;
+      background: var(--dark-bg);
     }
 
-    h1 {
-      font-size: 28px;
-      margin-bottom: 30px;
-      font-weight: bold;
-      color: #2c3e50;
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+    .page-header .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
     }
 
-    th {
-      background-color: #f0f2f5;
-      padding: 12px;
-      text-align: center;
+    .card-modern {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary-gradient);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header h3 {
+      font-size: 1.25rem;
       font-weight: 600;
-      color: #34495e;
+      color: var(--text-primary);
     }
 
-    td {
-      padding: 12px;
-      text-align: center;
-      background-color: #fff;
-      border-top: 1px solid #dee2e6;
+    .card-header .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
     }
 
-    .btn {
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-size: 14px;
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-control-modern {
+      background: var(--hover-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .form-control-modern:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
     }
 
     .btn-success {
-      background-color: #4caf50;
+      background: var(--success-gradient);
+      border: none;
       color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(79, 172, 254, 0.3);
     }
 
     .btn-danger {
-      background-color: #e74c3c;
+      background: var(--secondary-gradient);
+      border: none;
       color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-warning {
+      background: var(--warning-gradient);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-warning:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(252, 182, 159, 0.3);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+    }
+
+    .table-modern {
+      width: 100%;
+      background: transparent;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .table-modern thead {
+      background: var(--hover-bg);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-modern th {
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      border: none;
+    }
+
+    .table-modern td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+      border-left: none;
+      border-right: none;
+    }
+
+    .table-modern tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    .table-modern tbody tr:hover {
+      background: var(--hover-bg);
+    }
+
+    .table-modern tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .status-attente {
+      background: rgba(252, 182, 159, 0.1);
+      color: #fcb69f;
+    }
+
+    .status-valide {
+      background: rgba(79, 172, 254, 0.1);
+      color: #4facfe;
+    }
+
+    .status-refuse {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+    }
+
+    .amount-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary-gradient);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      min-width: 400px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary-gradient);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .modal-header .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .btn-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .notification.success {
+      background: var(--success-gradient);
+    }
+
+    .notification.error {
+      background: var(--secondary-gradient);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-
   <div class="sidebar">
-    <h2>EF Mada</h2>
-    <a href="pres/liste_prets.html"><i class="bi bi-list"></i> Voir les prêts</a>
-    <a href="pres/prets-attente.html"><i class="bi bi-hourglass-split"></i> Voir les prêts en attente</a>
-    <a href="fond.php"><i class="bi bi-cash-stack"></i> Ajouter un fond</a>
-    <a href="simulation.php"><i class="bi bi-calculator"></i> Simulation Prêt</a>
-    <a href="interet.php"><i class="bi bi-bar-chart"></i> Intérêt</a>
-    <a href="pres/liste_prets.html"><i class="bi bi-person-lines-fill"></i> Prêt Client</a>
+    <div class="sidebar-header">
+      <h2><i class="bi bi-graph-up"></i> EF Mada</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#"><i class="bi bi-house-door"></i> Dashboard</a>
+      <a href="#"><i class="bi bi-person"></i> Clients</a>
+      <a href="#"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="#"><i class="bi bi-calculator"></i> Simulation</a>
+      <a href="#" class="active"><i class="bi bi-list-check"></i> Prêts</a>
+      <a href="#"><i class="bi bi-hourglass-split"></i> Prêts en attente</a>
+      <a href="#"><i class="bi bi-gear"></i> Paramètres</a>
+    </nav>
   </div>
 
   <div class="main-content">
-    <h1>Liste des prêts en attente</h1>
-    <div class="card">
-      <table>
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Email</th>
-            <th>Type de prêt</th>
-            <th>Montant</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="table-prets">
-          <!-- Données JS -->
-        </tbody>
-      </table>
+    <div class="page-header">
+      <div class="icon">
+        <i class="bi bi-list-check" style="font-size: 1.5rem;"></i>
+      </div>
+      <div>
+        <h1>Liste des Prêts</h1>
+        <p class="subtitle">Gérez et suivez tous les prêts actifs</p>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total-prets">0</div>
+        <div class="stat-label">Total Prêts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-montant-total">0 Ar</div>
+        <div class="stat-label">Montant Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-en-attente">0</div>
+        <div class="stat-label">En Attente</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-valides">0</div>
+        <div class="stat-label">Validés</div>
+      </div>
+    </div>
+
+    <div class="card-modern">
+      <div class="card-header">
+        <div class="icon">
+          <i class="bi bi-funnel"></i>
+        </div>
+        <h3>Filtres</h3>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label><i class="bi bi-person"></i> Filtrer par Client</label>
+          <select id="filtre-client" class="form-control-modern" onchange="filtrerParClient()">
+            <option value="">Tous les clients</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><i class="bi bi-check-circle"></i> Filtrer par Statut</label>
+          <select id="filtre-statut" class="form-control-modern" onchange="filtrerParStatut()">
+            <option value="">Tous les statuts</option>
+            <option value="en_attente">En attente</option>
+            <option value="valide">Validé</option>
+            <option value="refuse">Refusé</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="opacity: 0;">Action</label>
+          <button onclick="chargerPrets()" class="btn-primary">
+            <i class="bi bi-arrow-clockwise"></i> Actualiser
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-modern">
+      <div class="card-header">
+        <div class="icon">
+          <i class="bi bi-table"></i>
+        </div>
+        <h3>Prêts Actifs</h3>
+      </div>
+      <div class="table-container">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Email</th>
+              <th>Type de Prêt</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-prets">
+            <!-- Données JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="empty-state" style="display: none;">
+        <i class="bi bi-inbox"></i>
+        <h3>Aucun prêt trouvé</h3>
+        <p>Aucun prêt ne correspond aux critères de recherche</p>
+      </div>
     </div>
   </div>
 
+  <!-- Modal Remboursement -->
+  <div class="modal-overlay" id="modal-remboursement">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="icon">
+          <i class="bi bi-cash"></i>
+        </div>
+        <h3>Ajouter un Remboursement</h3>
+      </div>
+      <div class="form-group">
+        <label><i class="bi bi-calendar"></i> Date de Paiement</label>
+        <input type="date" id="remb-date-paiement" class="form-control-modern">
+      </div>
+      <div class="btn-actions" style="margin-top: 1.5rem;">
+        <button onclick="validerRemboursement()" class="btn-success">
+          <i class="bi bi-check-circle"></i> Valider
+        </button>
+        <button onclick="fermerModal('modal-remboursement')" class="btn-danger">
+          <i class="bi bi-x-circle"></i> Annuler
+        </button>
+      </div>
+      <input type="hidden" id="remb-id-pret">
+    </div>
+  </div>
+
+  <!-- Modal N Mois -->
+  <div class="modal-overlay" id="modal-nmois">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="icon">
+          <i class="bi bi-calendar2-range"></i>
+        </div>
+        <h3>Rembourser N Mois</h3>
+      </div>
+      <div class="form-group">
+        <label><i class="bi bi-hash"></i> Nombre de Mois</label>
+        <input type="number" id="nmois-nb" min="1" placeholder="Ex: 3" class="form-control-modern">
+      </div>
+      <div class="btn-actions" style="margin-top: 1.5rem;">
+        <button onclick="validerRemboursementNmois()" class="btn-success">
+          <i class="bi bi-check-circle"></i> Valider
+        </button>
+        <button onclick="fermerModal('modal-nmois')" class="btn-danger">
+          <i class="bi bi-x-circle"></i> Annuler
+        </button>
+      </div>
+      <input type="hidden" id="nmois-id-pret">
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const apiBase = "http://localhost/projet_final/ws";
+    let pretsData = [];
 
-    function chargerPrets() {
-      fetch(apiBase + "/prets/en-attente")
-        .then(res => res.json())
-        .then(data => {
-          const tbody = document.getElementById("table-prets");
-          tbody.innerHTML = "";
-          data.forEach(p => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${p.nom_client}</td>
-              <td>${p.email}</td>
-              <td>${p.type_pret}</td>
-              <td>${p.montant} Ar</td>
-              <td>${new Date(p.date_demande).toLocaleDateString()}</td>
-              <td>
-                <button class="btn btn-success" onclick="validerPret(${p.id})">Valider</button>
-                <button class="btn btn-danger" onclick="refuserPret(${p.id})">Refuser</button>
-              </td>
-            `;
-            tbody.appendChild(tr);
-          });
-        });
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => notification.classList.add('show'), 100);
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => document.body.removeChild(notification), 300);
+      }, 3000);
     }
 
-function chargerPrets(idClient = "") {
-  const url = idClient ? `/clients/${idClient}/prets` : "/prets";
-  ajax("GET", url, null, (data) => {
-    const tbody = document.querySelector("#table-prets tbody");
-    tbody.innerHTML = "";
-    data.forEach(p => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${p.id}</td>
-        <td>${p.id_client}</td>
-<td>${p.nom_type_pret}</td>
-        <td>${formatAr(p.montant)} Ar</td>
-        <td>${p.statut || 'en attente'}</td>
-        <td>${p.date_demande}</td>
+    function formatAr(montant) {
+      return parseFloat(montant).toLocaleString('fr-FR');
+    }
+
+    function ajax(method, url, data, callback) {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, apiBase + url, true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            callback(response);
+          } catch (e) {
+            callback({ success: false, message: 'Erreur de format de réponse' });
+          }
+        } else {
+          callback({ success: false, message: 'Erreur de connexion' });
+        }
+      };
+      xhr.send(data);
+    }
+
+    function updateStats() {
+      const totalPrets = pretsData.length;
+      const montantTotal = pretsData.reduce((sum, p) => sum + parseFloat(p.montant || 0), 0);
+      const enAttente = pretsData.filter(p => p.statut === 'en_attente' || !p.statut).length;
+      const valides = pretsData.filter(p => p.statut === 'valide').length;
+
+      document.getElementById('stat-total-prets').textContent = totalPrets;
+      document.getElementById('stat-montant-total').textContent = formatAr(montantTotal) + ' Ar';
+      document.getElementById('stat-en-attente').textContent = enAttente;
+      document.getElementById('stat-valides').textContent = valides;
+    }
+
+    function getStatusBadge(statut) {
+      const statusMap = {
+        'en_attente': { class: 'status-attente', text: 'En Attente' },
+        'valide': { class: 'status-valide', text: 'Validé' },
+        'refuse': { class: 'status-refuse', text: 'Refusé' }
+      };
+      const status = statusMap[statut] || statusMap['en_attente'];
+      return `<span class="status-badge ${status.class}">${status.text}</span>`;
+    }
+
+    function chargerPrets(idClient = "", statut = "") {
+      let url = "/prets";
+      if (idClient) url = `/clients/${idClient}/prets`;
+      
+      ajax("GET", url, null, (data) => {
+        pretsData = data;
         
-<td>
-  <button onclick="exporterPDF(...)">📄 PDF</button>
-  <button onclick="ouvrirFormRemboursement(${p.id})">💰 Rembourser</button>
-  <button onclick="rembourserTout(${p.id})">💳 Tout</button>
-  <button onclick="ouvrirFormNmois(${p.id})">💸 N mois</button>
-</td>
-
-
-      `;
-      tbody.appendChild(tr);
-    });
-  });
-}
-
-
-
-    function filtrerParClient() {
-      const clientId = document.getElementById("filtre-client").value;
-      chargerPrets(clientId);
+        // Filtrer par statut si nécessaire
+        if (statut) {
+          pretsData = pretsData.filter(p => (p.statut || 'en_attente') === statut);
+        }
+        
+        const tbody = document.getElementById("table-prets");
+        const emptyState = document.getElementById("empty-state");
+        
+        tbody.innerHTML = "";
+        
+        if (pretsData.length === 0) {
+          emptyState.style.display = "block";
+          updateStats();
+          return;
+        }
+        
+        emptyState.style.display = "none";
+        
+        pretsData.forEach(p => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${p.id}</strong></td>
+            <td>${p.nom_client || p.id_client}</td>
+            <td>${p.email || 'N/A'}</td>
+            <td>${p.nom_type_pret || p.type_pret || 'N/A'}</td>
+            <td><span class="amount-badge">${formatAr(p.montant)} Ar</span></td>
+            <td>${getStatusBadge(p.statut || 'en_attente')}</td>
+            <td>${new Date(p.date_demande).toLocaleDateString()}</td>
+            <td>
+              <div class="btn-actions">
+                <button onclick="exporterPDF(${p.id}, ${p.id_client}, ${p.id_type_pret}, ${p.montant}, '${p.date_demande}')" class="btn-primary">
+                  <i class="bi bi-file-pdf"></i> PDF
+                </button>
+                <button onclick="ouvrirFormRemboursement(${p.id})" class="btn-primary">
+                  <i class="bi bi-cash"></i> Rembourser
+                </button>
+                <button onclick="rembourserTout(${p.id})" class="btn-primary">
+                  <i class="bi bi-credit-card"></i> Tout
+                </button>
+                <button onclick="ouvrirFormNmois(${p.id})" class="btn-primary">
+                  <i class="bi bi-calendar2-range"></i> N mois
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        
+        updateStats();
+      });
     }
 
-    function exporterPDF(id, clientId, typePretId, montant, dateDemande) {
-      ajax("GET", `/client/${clientId}`, null, (clientData) => {
-        const nomClient = clientData.nom_utilisateur;
-
-        ajax("GET", `/typepret/${typePretId}`, null, (typeData) => {
-          const taux_annuel = parseFloat(typeData.taux_interet);
-          const duree_mois = parseInt(typeData.duree_mois);
-          const taux_assurance = parseInt(typeData.assurance);
-          const nom = typeData.nom;
-          const taux_mensuel = taux_annuel / 100 / 12;
-
-          const mensualite_amortissable = (montant * taux_mensuel) /
-            (1 - Math.pow(1 + taux_mensuel, -duree_mois));
-          const total_amortissable = mensualite_amortissable * duree_mois;
-
-          const interet_simple_total = montant * (taux_annuel / 100) * (duree_mois / 12);
-          const total_simple = montant + interet_simple_total;
-          const mensualite_simple = total_simple / duree_mois;
-
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-
-          doc.setFillColor(44, 62, 80);
-          doc.rect(0, 0, 210, 25, 'F');
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(18);
-          doc.setFont("helvetica", "bold");
-          doc.text("BANQUE NATIONALE DE PRÊT", 15, 17);
-
-          doc.setFillColor(255, 255, 255);
-          doc.circle(190, 12, 6, 'F');
-          doc.setTextColor(44, 62, 80);
-          doc.setFontSize(8);
-          doc.text("BNP", 187, 14);
-
-          doc.setTextColor(0, 0, 0);
-          doc.setFontSize(16);
-          doc.setFont("helvetica", "bold");
-          doc.text("RELEVÉ DE PRÊT", 15, 35);
-          doc.setDrawColor(160);
-          doc.line(15, 38, 195, 38);
-
-          let y = 45;
-          doc.setFontSize(13);
-          doc.setFont("helvetica", "bold");
-          doc.text("Informations du Client", 15, y); y += 8;
-
-          doc.setFontSize(12);
-          doc.setFont("helvetica", "normal");
-          doc.text(`Nom du Client : ${nomClient}`, 20, y); y += 7;
-          doc.text(`Type de Prêt : ${nom}`, 20, y); y += 7;
-          doc.text(`Montant : ${formatAr(montant)} Ar`, 20, y); y += 7;
-          const dateSansHeure = dateDemande.split(" ")[0];
-          doc.text(`Date de Demande : ${dateSansHeure}`, 20, y); y += 7;
-          doc.text(`Durée : ${duree_mois} mois`, 20, y); y += 7;
-          doc.text(`Taux Annuel : ${taux_annuel}%`, 20, y); y += 12;
-
-          doc.setDrawColor(200);
-          doc.line(15, y, 195, y); y += 10;
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(13);
-          doc.setTextColor(0, 51, 102);
-          doc.text("Simulation - Intérêt Composé", 15, y); y += 8;
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`Mensualité estimée : ${formatAr(mensualite_amortissable)} Ar`, 20, y); y += 7;
-          doc.text(`Total à rembourser : ${formatAr(total_amortissable)} Ar`, 20, y); y += 12;
-
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(13);
-          doc.setTextColor(102, 0, 0);
-          doc.text("Simulation - Intérêt Simple", 15, y); y += 8;
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(12);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`Mensualité estimée : ${formatAr(mensualite_simple)} Ar`, 20, y); y += 7;
-          doc.text(`Total à rembourser : ${formatAr(total_simple)} Ar`, 20, y); y += 15;
-
-          doc.setDrawColor(180);
-          doc.line(15, y, 195, y); y += 10;
-
-          doc.setFontSize(10);
-          doc.setTextColor(120);
-          doc.text("Document confidentiel généré automatiquement – Ne pas divulguer", 15, 285);
-          doc.text("Page 1 / 1", 200, 285, { align: 'right' });
-
-          doc.save(`releve_pret_${id}.pdf`);
+    function chargerClients() {
+      ajax("GET", "/clients", null, (data) => {
+        const select = document.getElementById("filtre-client");
+        select.innerHTML = '<option value="">Tous les clients</option>';
+        
+        data.forEach(client => {
+          const option = document.createElement("option");
+          option.value = client.id;
+          option.textContent = client.nom_utilisateur || client.nom;
+          select.appendChild(option);
         });
       });
     }
-    function ouvrirFormRemboursement(idPret) {
+
+    function filtrerParClient() {
+      const clientId = document.getElementById("filtre-client").value;
+      const statut = document.getElementById("filtre-statut").value;
+      chargerPrets(clientId, statut);
+    }
+
+    function filtrerParStatut() {
+      const statut = document.getElementById("filtre-statut").value;
+      const clientId = document.getElementById("filtre-client").value;
+      chargerPrets(clientId, statut);
+    }
+
+function ouvrirFormRemboursement(idPret) {
   document.getElementById('remb-id-pret').value = idPret;
   document.getElementById('remb-date-paiement').value = '';
   document.getElementById('form-remboursement').style.display = 'block';

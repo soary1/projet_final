@@ -182,7 +182,7 @@
                     nom: `Auto-${p.taux}%/${p.duree}m`,
                     taux_interet: p.taux,
                     duree_mois: p.duree,
-                    assurance_percent: p.assurance
+                    assurance: p.assurance
                   })
                 });
               });

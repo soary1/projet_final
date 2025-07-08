@@ -556,10 +556,11 @@
     <nav class="sidebar-nav">
       <a href="#"><i class="bi bi-house-door"></i> Dashboard</a>
       <a href="#"><i class="bi bi-person"></i> Clients</a>
-      <a href="#"><i class="bi bi-bar-chart"></i> Intérêts</a>
-      <a href="#"><i class="bi bi-calculator"></i> Simulation</a>
-      <a href="#" class="active"><i class="bi bi-list-check"></i> Prêts</a>
-      <a href="#"><i class="bi bi-hourglass-split"></i> Prêts en attente</a>
+      <a href="ajouter_pret.php"><i class="bi bi-person"></i> Ajouter Pret</a>
+      <a href="../interet.php"><i class="bi bi-bar-chart"></i> Intérêts</a>
+      <a href="../simulation.php"><i class="bi bi-calculator"></i> Simulation</a>
+      <a href="../pres/liste_prets.html" class="active"><i class="bi bi-list-check"></i> Prêts</a>
+      <a href="../pres/prets-attente.html"><i class="bi bi-hourglass-split"></i> Prêts en attente</a>
       <a href="#"><i class="bi bi-gear"></i> Paramètres</a>
     </nav>
   </div>
@@ -612,7 +613,7 @@
           <label><i class="bi bi-check-circle"></i> Filtrer par Statut</label>
           <select id="filtre-statut" class="form-control-modern" onchange="filtrerParStatut()">
             <option value="">Tous les statuts</option>
-            <option value="en_attente">En attente</option>
+            <option value="en attente">En attente</option>
             <option value="valide">Validé</option>
             <option value="refuse">Refusé</option>
           </select>
@@ -705,6 +706,23 @@
     </div>
   </div>
 
+  <div id="form-remboursement" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">
+  <h3>Ajouter un remboursement</h3>
+  <input type="hidden" id="remb-id-pret">
+  <label>Date de paiement :</label>
+  <input type="date" id="remb-date-paiement"><br><br>
+  <button onclick="validerRemboursement()">✅ Valider</button>
+  <button onclick="fermerForm()">❌ Annuler</button>
+</div>
+<div id="form-nmois" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">
+  <h3>Rembourser N mois</h3>
+  <input type="hidden" id="nmois-id-pret">
+  <label>Nombre de mois :</label>
+  <input type="number" id="nmois-nb" min="1" placeholder="Ex: 3"><br><br>
+  <button onclick="validerRemboursementNmois()">✅ Valider</button>
+  <button onclick="document.getElementById('form-nmois').style.display = 'none'">❌ Annuler</button>
+</div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const apiBase = "http://localhost/projet_final/ws";
@@ -770,14 +788,13 @@
 
     function chargerPrets(idClient = "", statut = "") {
       let url = "/prets";
-      if (idClient) url = `/clients/${idClient}/prets`;
+      if (idClient) url = `/prets/clients/${idClient}`;
       
       ajax("GET", url, null, (data) => {
         pretsData = data;
-        
         // Filtrer par statut si nécessaire
         if (statut) {
-          pretsData = pretsData.filter(p => (p.statut || 'en_attente') === statut);
+          pretsData = pretsData.filter(p => (p.statut || "en attente") === statut);
         }
         
         const tbody = document.getElementById("table-prets");
@@ -1025,22 +1042,7 @@ function rembourserTout(idPret) {
 
     chargerPrets();
   </script>
-  <div id="form-remboursement" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">
-  <h3>Ajouter un remboursement</h3>
-  <input type="hidden" id="remb-id-pret">
-  <label>Date de paiement :</label>
-  <input type="date" id="remb-date-paiement"><br><br>
-  <button onclick="validerRemboursement()">✅ Valider</button>
-  <button onclick="fermerForm()">❌ Annuler</button>
-</div>
-<div id="form-nmois" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">
-  <h3>Rembourser N mois</h3>
-  <input type="hidden" id="nmois-id-pret">
-  <label>Nombre de mois :</label>
-  <input type="number" id="nmois-nb" min="1" placeholder="Ex: 3"><br><br>
-  <button onclick="validerRemboursementNmois()">✅ Valider</button>
-  <button onclick="document.getElementById('form-nmois').style.display = 'none'">❌ Annuler</button>
-</div>
+
 
 
 </body>

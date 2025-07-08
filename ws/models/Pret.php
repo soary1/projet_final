@@ -75,12 +75,13 @@ public static function byClient(int $idClient): array {
 
 
     public static function create(int $idClient, int $idTypePret, float $montant): int {
-        $st = getDB()->prepare("
-            INSERT INTO banque_pret (montant, date_demande, id_client, id_type_pret)
-            VALUES (?, CURDATE(), ?, ?)
+        $db = getDB();
+        $st = $db->prepare("
+            INSERT INTO banque_pret (montant, date_demande, id_client, id_type_pret, id_agent)
+            VALUES (?, CURDATE(), ?, ?, 1)
         ");
         $st->execute([$montant, $idClient, $idTypePret]);
-        return (int) getDB()->lastInsertId();
+        return $db->lastInsertId();
     }
 
     public static function delete(int $id): void {

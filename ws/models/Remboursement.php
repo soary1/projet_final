@@ -45,8 +45,10 @@ class Remboursement {
 
     // 2. Calcul de la mensualité (annuité constante)
     $tauxMensuel = $tauxAnnuel / 100 / 12;
+    $somme_ass = $montant * ($assurance / 100);
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
-    $mensualite = round($mensualite, 2) * $assurance;
+    $somme_ass = $somme_ass / $duree;
+    $mensualite += $somme_ass;
 
     // 3. Compter le nombre de remboursements déjà effectués
     $stmt = $db->prepare("SELECT COUNT(*) FROM banque_remboursement WHERE id_pret = ?");
@@ -94,9 +96,10 @@ public static function rembourserNmois(int $idPret, int $nbMois): bool {
 
     // Mensualité
     $tauxMensuel = $tauxAnnuel / 100 / 12;
+    $somme_ass = $montant * ($assurance / 100);
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
-    $mensualite = round($mensualite, 2) * $assurance;
-
+    $somme_ass = $somme_ass / $duree;
+    $mensualite += $somme_ass;
     // Récupérer les échéances déjà payées
     $stmt = $db->prepare("SELECT date_echeance FROM banque_remboursement WHERE id_pret = ?");
     $stmt->execute([$idPret]);
@@ -155,8 +158,10 @@ public static function rembourserTout(int $idPret): bool {
 
     // Calcul de la mensualité (annuité constante)
     $tauxMensuel = $tauxAnnuel / 100 / 12;
+    $somme_ass = $montant * ($assurance / 100);
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
-    $mensualite = round($mensualite, 2) *$assurance;
+    $somme_ass = $somme_ass / $duree;
+    $mensualite += $somme_ass;
 
     // Récupérer les dates d'échéance déjà existantes
     $stmt = $db->prepare("

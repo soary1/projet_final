@@ -134,3 +134,12 @@ drop database if exists banque;
 
 
 alter table banque_type_pret add column assurance DECIMAL(5,2) DEFAULT 0.00;
+
+CREATE TABLE banque_remboursement (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_pret INT NOT NULL,
+    montant DECIMAL(12,2) NOT NULL,
+    date_paiement DATE NOT NULL,
+    date_echeance DATE NOT NULL,
+    FOREIGN KEY (id_pret) REFERENCES banque_pret(id) ON DELETE CASCADE
+);

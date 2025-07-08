@@ -79,7 +79,13 @@ function chargerPrets(idClient = "") {
         <td>${formatAr(p.montant)} Ar</td>
         <td>${p.statut || 'en attente'}</td>
         <td>${p.date_demande}</td>
-        <td><button onclick="exporterPDF(${p.id}, ${p.id_client}, '${p.id_type_pret}', ${p.montant}, '${p.date_demande}')">📄 PDF</button></td>
+        
+<td>
+  <button onclick="exporterPDF(...)">📄 PDF</button>
+  <button onclick="ouvrirFormRemboursement(${p.id})">💰 Rembourser</button>
+  <button onclick="rembourserTout(${p.id})">💳 Rembourser tout</button>
+</td>
+
       `;
       tbody.appendChild(tr);
     });
@@ -187,9 +193,56 @@ function chargerPrets(idClient = "") {
         });
       });
     }
+    function ouvrirFormRemboursement(idPret) {
+  document.getElementById('remb-id-pret').value = idPret;
+  document.getElementById('remb-date-paiement').value = '';
+  document.getElementById('form-remboursement').style.display = 'block';
+}
+
+function fermerForm() {
+  document.getElementById('form-remboursement').style.display = 'none';
+}
+
+function validerRemboursement() {
+  const idPret = document.getElementById('remb-id-pret').value;
+  const datePaiement = document.getElementById('remb-date-paiement').value;
+
+  if (!datePaiement) {
+    alert("Veuillez saisir la date de paiement.");
+    return;
+  }
+
+  const params = `id_pret=${idPret}&date_paiement=${datePaiement}`;
+  ajax("POST", "/remboursements", params, (res) => {
+    if (res.success) {
+      alert("💰 Remboursement enregistré !");
+      fermerForm();
+    } else {
+      alert("Erreur : " + res.message);
+    }
+  });
+}
+function rembourserTout(idPret) {
+  if (!confirm("Générer toutes les mensualités de ce prêt ?")) return;
+
+  ajax("POST", `/remboursements/tout/${idPret}`, null, (res) => {
+    alert(res.message);
+  });
+}
+
+
 
     chargerClients();
     chargerPrets();
   </script>
+  <div id="form-remboursement" style="display:none; position:fixed; top:30%; left:40%; background:#fff; padding:20px; border:1px solid #ccc; box-shadow:2px 2px 8px #999;">
+  <h3>Ajouter un remboursement</h3>
+  <input type="hidden" id="remb-id-pret">
+  <label>Date de paiement :</label>
+  <input type="date" id="remb-date-paiement"><br><br>
+  <button onclick="validerRemboursement()">✅ Valider</button>
+  <button onclick="fermerForm()">❌ Annuler</button>
+</div>
+
 </body>
 </html>

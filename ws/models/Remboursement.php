@@ -26,7 +26,7 @@ class Remboursement {
     // 1. Récupérer les infos du prêt
     $stmt = $db->prepare("
         SELECT p.date_demande, p.montant AS montant_pret,
-               tp.taux_interet, tp.duree_mois, tp.delai_defaut
+               tp.taux_interet, tp.duree_mois, tp.delai_defaut, tp.assurance
         FROM banque_pret p
         JOIN banque_type_pret tp ON tp.id = p.id_type_pret
         WHERE p.id = ?
@@ -40,12 +40,13 @@ class Remboursement {
     $tauxAnnuel = (float) $pret['taux_interet'];
     $duree = (int) $pret['duree_mois'];
     $delai = (int) $pret['delai_defaut'];
+    $assurance = (float) $pret['assurance'];
     $dateDemande = new DateTime($pret['date_demande']);
 
     // 2. Calcul de la mensualité (annuité constante)
     $tauxMensuel = $tauxAnnuel / 100 / 12;
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
-    $mensualite = round($mensualite, 2);
+    $mensualite = round($mensualite, 2) * $assurance;
 
     // 3. Compter le nombre de remboursements déjà effectués
     $stmt = $db->prepare("SELECT COUNT(*) FROM banque_remboursement WHERE id_pret = ?");
@@ -74,7 +75,7 @@ public static function rembourserNmois(int $idPret, int $nbMois): bool {
 
     $stmt = $db->prepare("
         SELECT p.date_demande, p.montant AS montant_pret,
-               tp.taux_interet, tp.duree_mois, tp.delai_defaut
+               tp.taux_interet, tp.duree_mois, tp.delai_defaut, tp.assurance
         FROM banque_pret p
         JOIN banque_type_pret tp ON tp.id = p.id_type_pret
         WHERE p.id = ?
@@ -87,13 +88,14 @@ public static function rembourserNmois(int $idPret, int $nbMois): bool {
     $montant = (float) $pret['montant_pret'];
     $tauxAnnuel = (float) $pret['taux_interet'];
     $duree = (int) $pret['duree_mois'];
+    $assurance = (float) $pret['assurance'];
     $delai = (int) $pret['delai_defaut'];
     $dateDemande = new DateTime($pret['date_demande']);
 
     // Mensualité
     $tauxMensuel = $tauxAnnuel / 100 / 12;
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
-    $mensualite = round($mensualite, 2);
+    $mensualite = round($mensualite, 2) * $assurance;
 
     // Récupérer les échéances déjà payées
     $stmt = $db->prepare("SELECT date_echeance FROM banque_remboursement WHERE id_pret = ?");
@@ -134,7 +136,7 @@ public static function rembourserTout(int $idPret): bool {
     // Récupérer les infos du prêt
     $stmt = $db->prepare("
         SELECT p.date_demande, p.montant AS montant_pret,
-               tp.taux_interet, tp.duree_mois, tp.delai_defaut
+               tp.taux_interet, tp.duree_mois, tp.delai_defaut, p.assurance
         FROM banque_pret p
         JOIN banque_type_pret tp ON tp.id = p.id_type_pret
         WHERE p.id = ?
@@ -149,11 +151,12 @@ public static function rembourserTout(int $idPret): bool {
     $duree = (int) $pret['duree_mois'];
     $delai = (int) $pret['delai_defaut'];
     $dateDemande = new DateTime($pret['date_demande']);
+    $assurance = (float) $pret['assurance'];
 
     // Calcul de la mensualité (annuité constante)
     $tauxMensuel = $tauxAnnuel / 100 / 12;
     $mensualite = ($montant * $tauxMensuel) / (1 - pow(1 + $tauxMensuel, -$duree));
-    $mensualite = round($mensualite, 2);
+    $mensualite = round($mensualite, 2) *$assurance;
 
     // Récupérer les dates d'échéance déjà existantes
     $stmt = $db->prepare("
@@ -228,6 +231,7 @@ public static function rembourserTout(int $idPret): bool {
             GROUP BY mois_paiement
             ORDER BY mois_paiement ASC
         ");
+
         $stmt->execute([$dateDebut, $dateFin]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

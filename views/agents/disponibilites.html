@@ -531,222 +531,225 @@
     </div>
   </div>
 
-  <script>
-    const apiBase = "http://localhost/projet_final/ws";
-    const form = document.getElementById("filtre-form");
-    const tableBody = document.getElementById("table-body");
-    const ctx = document.getElementById("dispoChart").getContext("2d");
-    let chart;
+<script>
+  const apiBase = "http://localhost/projet_final/ws";
+  const form = document.getElementById("filtre-form");
+  const tableBody = document.getElementById("table-body");
+  const ctx = document.getElementById("dispoChart").getContext("2d");
+  let chart;
 
-    function showLoading() {
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('table-container').style.display = 'none';
-      document.getElementById('empty-state').style.display = 'none';
+  function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('table-container').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+  }
+
+  function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('table-container').style.display = 'block';
+  }
+
+  function updateStats(data) {
+    const statsGrid = document.getElementById('stats-grid');
+    let totalFonds = data.reduce((sum, item) => sum + item.fonds_du_mois, 0);
+    let totalEmpruntes = data.reduce((sum, item) => sum + item.empruntes_du_mois, 0);
+    let totalRemboursements = data.reduce((sum, item) => sum + item.remboursements_du_mois, 0);
+    let moyenneDisponible = data.length > 0
+      ? data.reduce((sum, item) => sum + item.disponible_cumule, 0) / data.length
+      : 0;
+
+    statsGrid.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-value">${totalFonds.toLocaleString()} Ar</div>
+        <div class="stat-label">Total fonds reçus</div>
+      </div>
+      <div class="stat-card secondary">
+        <div class="stat-value">${totalEmpruntes.toLocaleString()} Ar</div>
+        <div class="stat-label">Total emprunts</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-value">${totalRemboursements.toLocaleString()} Ar</div>
+        <div class="stat-label">Total remboursements</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-value">${moyenneDisponible.toLocaleString()} Ar</div>
+        <div class="stat-label">Disponibilité moyenne</div>
+      </div>
+    `;
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    showLoading();
+
+    const debut = document.getElementById("debut").value;
+    const fin = document.getElementById("fin").value;
+
+    if (!debut || !fin) {
+      hideLoading();
+      return;
     }
 
-    function hideLoading() {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('table-container').style.display = 'block';
-    }
-
-    function updateStats(data) {
-      const statsGrid = document.getElementById('stats-grid');
-      let totalFonds = data.reduce((sum, item) => sum + item.fonds, 0);
-      let totalEmpruntes = data.reduce((sum, item) => sum + item.montants_empruntes, 0);
-      let totalRemboursements = data.reduce((sum, item) => sum + item.remboursements, 0);
-      let moyenneDisponible = data.length > 0 ? data.reduce((sum, item) => sum + item.disponible, 0) / data.length : 0;
-
-      statsGrid.innerHTML = `
-        <div class="stat-card">
-          <div class="stat-value">${totalFonds.toLocaleString()} Ar</div>
-          <div class="stat-label">Total fonds reçus</div>
-        </div>
-        <div class="stat-card secondary">
-          <div class="stat-value">${totalEmpruntes.toLocaleString()} Ar</div>
-          <div class="stat-label">Total emprunts</div>
-        </div>
-        <div class="stat-card success">
-          <div class="stat-value">${totalRemboursements.toLocaleString()} Ar</div>
-          <div class="stat-label">Total remboursements</div>
-        </div>
-        <div class="stat-card warning">
-          <div class="stat-value">${moyenneDisponible.toLocaleString()} Ar</div>
-          <div class="stat-label">Disponibilité moyenne</div>
-        </div>
-      `;
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      showLoading();
-      
-      const debut = document.getElementById("debut").value;
-      const fin = document.getElementById("fin").value;
-
-      if (!debut || !fin) {
+    fetch(`${apiBase}/disponibilites?debut=${debut}&fin=${fin}`)
+      .then(res => res.json())
+      .then(data => {
         hideLoading();
-        return;
-      }
 
-      fetch(`${apiBase}/disponibilites?debut=${debut}&fin=${fin}`)
-        .then(res => res.json())
-        .then(data => {
-          hideLoading();
-          
-          if (data.length === 0) {
-            document.getElementById('empty-state').style.display = 'block';
-            document.getElementById('table-container').style.display = 'none';
-            return;
-          }
+        if (!Array.isArray(data) || data.length === 0) {
+          document.getElementById('empty-state').style.display = 'block';
+          document.getElementById('table-container').style.display = 'none';
+          return;
+        }
 
-          updateStats(data);
-          
-          tableBody.innerHTML = "";
-          const labels = [];
-          const fonds = [];
-          const empruntes = [];
-          const remboursements = [];
-          const disponibles = [];
+        updateStats(data);
 
-          data.forEach(item => {
-            labels.push(item.mois);
-            fonds.push(item.fonds);
-            empruntes.push(item.montants_empruntes);
-            remboursements.push(item.remboursements);
-            disponibles.push(item.disponible);
+        tableBody.innerHTML = "";
+        const labels = [];
+        const fonds = [];
+        const empruntes = [];
+        const remboursements = [];
+        const disponibles = [];
 
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td><strong>${item.mois}</strong></td>
-              <td><span class="amount-badge amount-fonds">${item.fonds.toLocaleString()} Ar</span></td>
-              <td><span class="amount-badge amount-empruntes">${item.montants_empruntes.toLocaleString()} Ar</span></td>
-              <td><span class="amount-badge amount-remboursements">${item.remboursements.toLocaleString()} Ar</span></td>
-              <td><span class="amount-badge amount-disponible">${item.disponible.toLocaleString()} Ar</span></td>
-            `;
-            tableBody.appendChild(row);
-          });
+        data.forEach(item => {
+          labels.push(item.mois);
+          fonds.push(item.fonds_du_mois);
+          empruntes.push(item.empruntes_du_mois);
+          remboursements.push(item.remboursements_du_mois);
+          disponibles.push(item.disponible_cumule);
 
-          // Refresh chart
-          if (chart) chart.destroy();
-          chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: labels,
-              datasets: [
-                {
-                  label: 'Fonds reçus',
-                  data: fonds,
-                  borderColor: '#667eea',
-                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: '#667eea',
-                  pointBorderColor: '#ffffff',
-                  pointBorderWidth: 2,
-                  pointRadius: 5
-                },
-                {
-                  label: 'Montants empruntés',
-                  data: empruntes,
-                  borderColor: '#ff6b6b',
-                  backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: '#ff6b6b',
-                  pointBorderColor: '#ffffff',
-                  pointBorderWidth: 2,
-                  pointRadius: 5
-                },
-                {
-                  label: 'Remboursements',
-                  data: remboursements,
-                  borderColor: '#10b981',
-                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: '#10b981',
-                  pointBorderColor: '#ffffff',
-                  pointBorderWidth: 2,
-                  pointRadius: 5
-                },
-                {
-                  label: 'Disponibilité finale',
-                  data: disponibles,
-                  borderColor: '#8b5cf6',
-                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                  tension: 0.4,
-                  fill: true,
-                  pointBackgroundColor: '#8b5cf6',
-                  pointBorderColor: '#ffffff',
-                  pointBorderWidth: 2,
-                  pointRadius: 5
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  labels: {
-                    color: '#8b949e',
-                    font: {
-                      size: 12,
-                      weight: 500
-                    }
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td><strong>${item.mois}</strong></td>
+            <td><span class="amount-badge amount-fonds">${item.fonds_du_mois.toLocaleString()} Ar</span></td>
+            <td><span class="amount-badge amount-empruntes">${item.empruntes_du_mois.toLocaleString()} Ar</span></td>
+            <td><span class="amount-badge amount-remboursements">${item.remboursements_du_mois.toLocaleString()} Ar</span></td>
+            <td><span class="amount-badge amount-disponible">${item.disponible_cumule.toLocaleString()} Ar</span></td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+        // Génère le graphique
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Fonds reçus',
+                data: fonds,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+              },
+              {
+                label: 'Montants empruntés',
+                data: empruntes,
+                borderColor: '#ff6b6b',
+                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#ff6b6b',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+              },
+              {
+                label: 'Remboursements',
+                data: remboursements,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+              },
+              {
+                label: 'Disponibilité finale',
+                data: disponibles,
+                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#8b5cf6',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: '#8b949e',
+                  font: {
+                    size: 12,
+                    weight: 500
                   }
-                },
-                tooltip: { 
-                  mode: 'index', 
-                  intersect: false,
-                  backgroundColor: 'rgba(26, 31, 46, 0.9)',
-                  titleColor: '#ffffff',
-                  bodyColor: '#8b949e',
-                  borderColor: '#30363d',
-                  borderWidth: 1
                 }
               },
-              scales: {
-                y: { 
-                  beginAtZero: true,
-                  ticks: {
-                    color: '#8b949e'
-                  },
-                  grid: {
-                    color: '#30363d'
-                  }
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(26, 31, 46, 0.9)',
+                titleColor: '#ffffff',
+                bodyColor: '#8b949e',
+                borderColor: '#30363d',
+                borderWidth: 1
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: '#8b949e'
                 },
-                x: {
-                  ticks: {
-                    color: '#8b949e'
-                  },
-                  grid: {
-                    color: '#30363d'
-                  }
+                grid: {
+                  color: '#30363d'
+                }
+              },
+              x: {
+                ticks: {
+                  color: '#8b949e'
+                },
+                grid: {
+                  color: '#30363d'
                 }
               }
             }
-          });
-        })
-        .catch(error => {
-          hideLoading();
-          console.error('Erreur:', error);
-          document.getElementById('empty-state').style.display = 'block';
-          document.getElementById('table-container').style.display = 'none';
+          }
         });
-    });
-
-    function logout() {
-      fetch("http://localhost/projet_final/ws/logout", {
-        method: "POST"
       })
-      .then(() => {
-        window.location.href = "../../index.html";
-      })
-      .catch(() => {
-        window.location.href = "../../index.html";
+      .catch(error => {
+        hideLoading();
+        console.error('Erreur:', error);
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('table-container').style.display = 'none';
       });
-    }
-  </script>
+  });
+
+  function logout() {
+    fetch("http://localhost/projet_final/ws/logout", {
+      method: "POST"
+    })
+    .then(() => {
+      window.location.href = "../../index.html";
+    })
+    .catch(() => {
+      window.location.href = "../../index.html";
+    });
+  }
+</script>
+
 </body>
 </html>
